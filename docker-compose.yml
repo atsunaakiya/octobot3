@@ -15,7 +15,7 @@ services:
     command: [ ./scripts/deps.sh ]
   server: *py
     ports:
-      '18023:8000'
+      - '18023:8000'
     command: [ ./scripts/task.sh, server ]
   cron: *py
     command: [ ./scripts/task.sh, cron ]
