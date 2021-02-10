@@ -22,8 +22,8 @@ pull_services: Mapping[ServiceType, Type[PullService]] = {
 }
 
 push_services: Mapping[ServiceType, Type[PushService]] = {
+    ServiceType.WebDav: WebDavService,
     ServiceType.Telegram: TelegramService,
-    ServiceType.WebDav: WebDavService
 }
 
 
