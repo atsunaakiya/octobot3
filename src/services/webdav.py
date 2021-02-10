@@ -37,15 +37,15 @@ class WebDavServiceBase:
         self.dir_struct = {}
         from src.services import pull_services
         for t in pull_services.keys():
-            if self.client.check(t.value):
-                self.dir_struct[t] = set(x[:-1] for x in self.client.list(t.value)) - {t.value}
-            else:
-                self.dir_struct[t] = set()
+            if not self.client.check(t.value):
                 self.client.mkdir(t.value)
+            self.dir_struct[t] = set()
 
     def write_file(self, service: ServiceType, dir_name: str, filename: str, buffer: IO):
         if dir_name not in self.dir_struct[service]:
-            self.client.mkdir(f"{service.value}/{dir_name}")
+            dp = f"{service.value}/{dir_name}"
+            if not self.client.check(dp):
+                self.client.mkdir(dp)
             self.dir_struct[service].add(dir_name)
         fp = f"{service.value}/{dir_name}/{filename}"
         with NamedTemporaryFile() as f:
