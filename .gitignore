@@ -6,3 +6,4 @@
 /config.toml
 /data
 /tmp
+.DS_Store
