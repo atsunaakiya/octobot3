@@ -4,7 +4,7 @@ from threading import Thread
 import schedule
 
 from src.models.connect import connect_db
-from src.tasks import update_index
+from src.tasks.update_index import update_index
 from src.tasks.download_images import download_images
 from src.tasks.post_images import post_images
 from src.tasks.update_subs import update_subs
