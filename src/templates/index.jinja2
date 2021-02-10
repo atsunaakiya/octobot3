@@ -1,0 +1,13 @@
+<html>
+<head>
+    <title>OctoBot3</title>
+    <meta charset="UTF-8"/>
+</head>
+<body>
+    <ul>
+    {% for nm, pipe in pipelines %}
+        <li><a href="/pipeline/{{ nm }}">{{ nm }}</a></li>
+    {% endfor %}
+    </ul>
+</body>
+</html>

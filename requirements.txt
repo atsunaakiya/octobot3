@@ -1,0 +1,9 @@
+flask
+mongoengine
+toml
+tweepy
+typeguard
+Pillow
+python-telegram-bot
+webdavclient3
+schedule

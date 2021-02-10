@@ -1,0 +1,60 @@
+<html>
+<head>
+    <title>{{ pipeline_name }} - OctoBot3</title>
+    <meta charset="UTF-8"/>
+</head>
+<body>
+    <h1>Items</h1>
+    <form action="/pipeline/{{ pipeline_name }}/items/add" method="post">
+        <input type="text" name="url">
+        <input type="submit" value="Add">
+    </form>
+    <table>
+        <tr>
+            <th>Fetching</th>
+            <th>Downloading</th>
+            <th>Posting</th>
+            <th>Cleaning</th>
+            <th>Success</th>
+            <th>Failed</th>
+        </tr>
+        <tr>
+            <td>{{ status['fetching'] }}</td>
+            <td>{{ status['downloading'] }}</td>
+            <td>{{ status['posting'] }}</td>
+            <td>{{ status['cleaning'] }}</td>
+            <td>{{ status['done'] }}</td>
+            <td>{{ status['failed'] }}</td>
+        </tr>
+    </table>
+    <h1>Subscriptions</h1>
+    {% for service_type, service_func, source_list in subs %}
+        <h2>{{ service_type }}.{{ service_func }}</h2>
+        <p>
+            <form action="/pipeline/{{ pipeline_name }}/subs/add" method="post">
+                <input type="text" name="name">
+                <input type="hidden" name="service" value="{{ service_type }}">
+                <input type="hidden" name="func" value="{{ service_func }}">
+                <input type="submit" value="Add">
+            </form>
+        </p>
+        <ul>
+        {% for id, title, url in source_list %}
+            <li>
+            {% if url %}
+                <a href="{{ url }}" target="_blank">{{ id or title }}</a>
+            {% else %}
+                {{ id or title }}
+            {% endif %}
+            <form action="/pipeline/{{ pipeline_name }}/subs/delete" method="post">
+                <input type="hidden" name="service" value="{{ service_type }}">
+                <input type="hidden" name="func" value="{{ service_func }}">
+                <input type="hidden" name="name" value="{{ id }}">
+                <input type="submit" value="Delete">
+            </form>
+            </li>
+        {% endfor %}
+        </ul>
+    {% endfor %}
+</body>
+</html>

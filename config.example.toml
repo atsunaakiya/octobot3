@@ -1,0 +1,47 @@
+[server]
+host='0.0.0.0'
+port=8000
+debug=true
+
+[db]
+host='mongo'
+port=27017
+db='octo'
+
+[limit]
+fetch=50
+download=20
+
+
+[api.twitter.default_twitter]
+consumer_key="<consumer_key>"
+consumer_secret="<consumer_secret>"
+access_key="<access_key>"
+access_secret="<access_secret>"
+
+[api.telegram.default_telegram]
+channels= ['@yourChannel', '10000000']
+token="<token>"
+media_group_limit=9
+
+#[api.telegram.another_telegram]
+#channels= ['@yourChannel', '10000000']
+#token="<token>"
+#media_group_limit=9
+
+
+[api.webdav.default_webdav]
+host='<host>'
+port=443
+use_https=true
+username='<username>'
+password='<password>'
+path='/<path>'
+root_dir='/<dir>'
+
+
+[pipeline.default_pipeline]
+subscribe=["twitter.username:default_twitter"]
+pull=["twitter:default_twitter"]
+push=["telegram:default_telegram", "webdav:default_webdav"]
+
