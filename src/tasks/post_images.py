@@ -12,13 +12,12 @@ config = load_config()
 
 def post_images():
     for item in ItemInfo.poll_status(TaskStage.Posting, TaskStatus.Queued):
-        visited = {}
         channels = ItemInfo.get_channels(item)
+        images = [i.read() for i in ItemInfo.get_images(item)]
         for ch in channels:
             for pipe in config.pipeline[ch].push:
                 print((item.service.value, item.item_id), '=>', (pipe.service.value, pipe.config))
                 service = get_service(pipe.service, pipe.config)
-                images = [i.read() for i in ItemInfo.get_images(item)]
                 service.push_item(item, list(map(BytesIO, images)), ch)
         ItemInfo.set_status(item.service, item.item_id, TaskStage.Cleaning, TaskStatus.Queued)
 

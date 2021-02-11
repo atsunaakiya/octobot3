@@ -11,6 +11,7 @@ from src.data import FullItem
 from src.enums import ServiceType
 from src.models.post import PostRecord
 from src.models.user import UserInfo
+from src.models.utils import ServiceKVStore
 from src.services.base import PushService
 
 
@@ -24,6 +25,7 @@ class WebDavConfig:
     path: str
     root_dir: str
 
+SERVICE_NAME='webdav.post.service'
 
 class WebDavServiceBase:
     def __init__(self, conf: WebDavConfig):
@@ -35,19 +37,19 @@ class WebDavServiceBase:
             'webdav_timeout': 600
         }
         self.client = Client(options)
-        self.dir_struct = {}
-        from src.services import pull_services
-        for t in pull_services.keys():
-            if not self.client.check(t.value):
-                self.client.mkdir(t.value)
-            self.dir_struct[t] = set()
+
+    def ensure_dir(self, path: str):
+        if ServiceKVStore.exists(SERVICE_NAME, path):
+            return
+        if self.client.check(path):
+            ServiceKVStore.put(SERVICE_NAME, path, {})
+            return
+        self.client.mkdir(path)
+        ServiceKVStore.put(SERVICE_NAME, path, {})
 
     def write_file(self, service: ServiceType, dir_name: str, filename: str, buffer: IO):
-        if dir_name not in self.dir_struct[service]:
-            dp = f"{service.value}/{dir_name}"
-            if not self.client.check(dp):
-                self.client.mkdir(dp)
-            self.dir_struct[service].add(dir_name)
+        self.ensure_dir(service.value)
+        self.ensure_dir(f"{service.value}/{dir_name}")
         fp = f"{service.value}/{dir_name}/{filename}"
         with NamedTemporaryFile() as f:
             f.write(buffer.read())

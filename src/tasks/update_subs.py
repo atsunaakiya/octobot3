@@ -15,14 +15,14 @@ def update_subs():
         service = service_type(service_conf)
         for name, channels in SubscribeSource.get_subs(stype, sfunc):
             for item in service.subscribe_index(name):
-                ItemInfo.add_index(item, channels)
-                print(stype.value, sfunc, name, item)
                 if not ItemInfo.exists(item.service, item.item_id):
+                    ItemInfo.add_index(item, channels)
+                    print(stype.value, sfunc, name, item)
                     ItemInfo.set_status(item.service, item.item_id, TaskStage.Fetching, TaskStatus.Queued)
             for item in service.subscribe_full(name):
-                ItemInfo.add_item(item, channels)
-                print(stype.value, sfunc, name, item)
                 if not ItemInfo.exists(item.service, item.item_id):
+                    ItemInfo.add_item(item, channels)
+                    print(stype.value, sfunc, name, item)
                     ItemInfo.set_status(item.service, item.item_id, TaskStage.Downloading, TaskStatus.Queued)
 
 
