@@ -31,7 +31,8 @@ class WebDavServiceBase:
         options = {
             'webdav_hostname': url,
             'webdav_login': conf.username,
-            'webdav_password': conf.password
+            'webdav_password': conf.password,
+            'webdav_timeout': 600
         }
         self.client = Client(options)
         self.dir_struct = {}
