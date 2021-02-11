@@ -12,6 +12,7 @@ config = load_config()
 
 def post_images():
     for item in ItemInfo.poll_status(TaskStage.Posting, TaskStatus.Queued):
+        visited = {}
         channels = ItemInfo.get_channels(item)
         for ch in channels:
             for pipe in config.pipeline[ch].push:
