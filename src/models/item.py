@@ -98,6 +98,7 @@ class ItemInfo(DynamicDocument):
             'failed': failed
         }
 
+
     @classmethod
     def get_channels(cls, item: FullItem):
         return [

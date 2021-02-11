@@ -1,9 +1,17 @@
 <html>
 <head>
     <title>{{ pipeline_name }} - OctoBot3</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8"/>
+    <style>
+        .entry {
+            font-size: 1.5rem;
+            margin: 0.2rem;
+        }
+    </style>
 </head>
 <body>
+    <p><a href="/">&lt;&lt; Back</a></p>
     <h1>Items</h1>
     <form action="/pipeline/{{ pipeline_name }}/items/add" method="post">
         <input type="text" name="url">
@@ -28,8 +36,8 @@
         </tr>
     </table>
     <h1>Subscriptions</h1>
-    {% for service_type, service_func, source_list in subs %}
-        <h2>{{ service_type }}.{{ service_func }}</h2>
+    {% for service_type, service_func, source_list, slen in subs %}
+        <h2>{{ service_type }}.{{ service_func }} ({{ slen }})</h2>
         <p>
             <form action="/pipeline/{{ pipeline_name }}/subs/add" method="post">
                 <input type="text" name="name">
@@ -38,23 +46,28 @@
                 <input type="submit" value="Add">
             </form>
         </p>
-        <ul>
+        <table>
         {% for id, title, url in source_list %}
-            <li>
-            {% if url %}
-                <a href="{{ url }}" target="_blank">{{ id or title }}</a>
-            {% else %}
-                {{ id or title }}
-            {% endif %}
-            <form action="/pipeline/{{ pipeline_name }}/subs/delete" method="post">
-                <input type="hidden" name="service" value="{{ service_type }}">
-                <input type="hidden" name="func" value="{{ service_func }}">
-                <input type="hidden" name="name" value="{{ id }}">
-                <input type="submit" value="Delete">
-            </form>
-            </li>
+            <tr>
+                <td>
+                    {% if url %}
+                        <a class="entry" href="{{ url }}" target="_blank">{{ id or title }}</a>
+                    {% else %}
+                        <span class="entry" >{{ id or title }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <form action="/pipeline/{{ pipeline_name }}/subs/delete" method="post"
+                          onsubmit="return confirm('Delete {{ id or title }}?');">
+                        <input type="hidden" name="service" value="{{ service_type }}">
+                        <input type="hidden" name="func" value="{{ service_func }}">
+                        <input type="hidden" name="name" value="{{ id }}">
+                        <input type="submit" value="Delete">
+                    </form>
+                </td>
+            </tr>
         {% endfor %}
-        </ul>
+        </table>
     {% endfor %}
 </body>
 </html>

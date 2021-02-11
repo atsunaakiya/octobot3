@@ -1,13 +1,39 @@
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OctoBot3</title>
-    <meta charset="UTF-8"/>
+    <style>
+        .entry{
+            font-size: 1.5rem;
+            margin: 0.5rem;
+        }
+    </style>
 </head>
 <body>
+    <h1>OctoBot3</h1>
     <ul>
     {% for nm, pipe in pipelines %}
-        <li><a href="/pipeline/{{ nm }}">{{ nm }}</a></li>
+        <li><a class="entry" href="/pipeline/{{ nm }}">{{ nm }}</a></li>
     {% endfor %}
     </ul>
+    <table>
+        <tr>
+            <th>Fetching</th>
+            <th>Downloading</th>
+            <th>Posting</th>
+            <th>Cleaning</th>
+            <th>Success</th>
+            <th>Failed</th>
+        </tr>
+        <tr>
+            <td>{{ status['fetching'] }}</td>
+            <td>{{ status['downloading'] }}</td>
+            <td>{{ status['posting'] }}</td>
+            <td>{{ status['cleaning'] }}</td>
+            <td>{{ status['done'] }}</td>
+            <td>{{ status['failed'] }}</td>
+        </tr>
+    </table>
 </body>
 </html>

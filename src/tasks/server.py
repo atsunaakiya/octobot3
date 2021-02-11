@@ -19,20 +19,20 @@ app = Flask(__name__, template_folder=template_folder)
 @app.route("/")
 def _index():
     pipelines = load_config().pipeline.items()
-    return render_template('index.jinja2', pipelines=pipelines)
+    status = ItemInfo.count_status()
+    return render_template('index.jinja2', pipelines=pipelines, status=status)
 
 
 @app.route("/pipeline/<pipeline_name>")
 def _pipeline(pipeline_name):
     config = load_config()
     pipeline = config.pipeline[pipeline_name]
-    subs = [
-        (s.service[0].value, s.service[1], [
+    subs = []
+    for s in pipeline.subscribe:
+        l = [
             (n, subscribe_services[s.service].get_title(n), subscribe_services[s.service].get_url(n))
-            for n, channels in SubscribeSource.get_subs_by_channel(*s.service, pipeline_name)
-        ])
-        for s in pipeline.subscribe
-    ]
+            for n, channels in SubscribeSource.get_subs_by_channel(*s.service, pipeline_name)]
+        subs.append((s.service[0].value, s.service[1], l, len(l)))
     status = ItemInfo.count_status()
     return render_template('pipeline.jinja2',
                            pipeline_name=pipeline_name,
