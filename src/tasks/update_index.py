@@ -1,4 +1,5 @@
 import time
+import traceback
 from functools import lru_cache
 
 from src.config import load_config, RootConfig
@@ -18,13 +19,13 @@ def update_index():
         try:
             full_item = service.pull_item(IndexItem(item.service, item.item_id))
         except FetchFailureError as err:
-            print(err)
-            ItemInfo.set_status(item.service, item.item_id, TaskStage.Fetching, TaskStatus.Failed)
+            traceback.print_exc()
         else:
             print(full_item)
             ItemInfo.add_item(full_item, [])
             ItemInfo.set_status(item.service, item.item_id, TaskStage.Downloading, TaskStatus.Queued)
         time.sleep(1)
+    ItemInfo.abandon_tasks(TaskStage.Fetching, TaskStatus.Queued, 20, TaskStage.Fetching, TaskStatus.Failed)
 
 
 @lru_cache()

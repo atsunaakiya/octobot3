@@ -22,8 +22,13 @@ class SubscribeSource(DynamicDocument):
             cls.objects(service_type=stype, service_func=sfunc, name=name).delete()
 
     @classmethod
+    def get_subs_by_channel(cls, stype: ServiceType, sfunc: str, channel: str):
+        for it in SubscribeChannel.objects(service_type=stype, service_func=sfunc, channel=channel):
+            yield it.name
+
+    @classmethod
     def get_subs(cls, stype: ServiceType, sfunc: str) -> Iterable[Tuple[str, List[str]]]:
-        for it in SubscribeChannel.objects(service_type=stype, service_func=sfunc):
+        for it in cls.objects(service_type=stype, service_func=sfunc):
             channels = list(cls.get_channels(stype, sfunc, it.name))
             yield it.name, channels
 

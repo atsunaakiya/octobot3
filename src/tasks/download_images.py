@@ -1,4 +1,5 @@
 import time
+import traceback
 from io import BytesIO
 
 from PIL import Image
@@ -27,10 +28,10 @@ def download_images():
                     ItemInfo.save_image(item, url, buf)
                 time.sleep(1)
         except FetchFailureError as err:
-            print(err)
-            ItemInfo.set_status(item.service, item.item_id, TaskStage.Downloading, TaskStatus.Failed)
+            traceback.print_exc()
         else:
             ItemInfo.set_status(item.service, item.item_id, TaskStage.Posting, TaskStatus.Queued)
+    ItemInfo.abandon_tasks(TaskStage.Downloading, TaskStatus.Queued, 20, TaskStage.Downloading, TaskStatus.Failed)
 
 @lru_cache()
 def get_service(stype: ServiceType):

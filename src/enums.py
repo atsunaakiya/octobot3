@@ -18,3 +18,9 @@ class TaskStage(Enum):
 class TaskStatus(Enum):
     Queued = 'queued'
     Failed = 'failed'
+    Pending = 'pending'
+
+
+class SecondaryTaskStatus(Enum):
+    Queued = 'queued'
+    Finished = 'finished'

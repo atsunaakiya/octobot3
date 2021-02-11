@@ -1,10 +1,11 @@
+import traceback
 from functools import lru_cache
 from io import BytesIO
 
 from src.config import load_config
 from src.enums import TaskStatus, TaskStage, ServiceType
 from src.models.connect import connect_db
-from src.models.item import ItemInfo
+from src.models.item import ItemInfo, SecondaryTask
 from src.services import push_services
 
 config = load_config()
@@ -13,13 +14,25 @@ config = load_config()
 def post_images():
     for item in ItemInfo.poll_status(TaskStage.Posting, TaskStatus.Queued):
         channels = ItemInfo.get_channels(item)
-        images = [i.read() for i in ItemInfo.get_images(item)]
         for ch in channels:
             for pipe in config.pipeline[ch].push:
-                print((item.service.value, item.item_id), '=>', (pipe.service.value, pipe.config))
-                service = get_service(pipe.service, pipe.config)
-                service.push_item(item, list(map(BytesIO, images)), ch)
-        ItemInfo.set_status(item.service, item.item_id, TaskStage.Cleaning, TaskStatus.Queued)
+                SecondaryTask.add_task(item.service, item.item_id, pipe.service, pipe.config, ch)
+        ItemInfo.set_status(item.service, item.item_id, TaskStage.Posting, TaskStatus.Pending)
+    for stype, item_id, ptype, conf, ch in SecondaryTask.poll_tasks():
+        print((stype.value, item_id), '=>', (ptype.value, conf))
+        item = ItemInfo.get_item(stype, item_id)
+        images = [BytesIO(i.read()) for i in ItemInfo.get_images(item)]
+        client = get_service(ptype, conf)
+        try:
+            client.push_item(item, images, ch)
+        except Exception as err:
+            traceback.print_exc()
+        else:
+            SecondaryTask.close_task(stype, item_id, ptype, conf, ch)
+        if SecondaryTask.task_done(stype, item_id):
+            print("Post Done", (item.service, item.item_id))
+            ItemInfo.set_status(item.service, item.item_id, TaskStage.Cleaning, TaskStatus.Queued)
+
 
 
 @lru_cache()

@@ -3,7 +3,7 @@ from typing import Optional, Union, List, Tuple, Iterable, IO
 from mongoengine import *
 
 from src.data import FullItem, IndexItem
-from src.enums import ServiceType, TaskStage, TaskStatus
+from src.enums import ServiceType, TaskStage, TaskStatus, SecondaryTaskStatus
 
 
 class ItemInfo(DynamicDocument):
@@ -44,21 +44,34 @@ class ItemInfo(DynamicDocument):
             if limit == 0:
                 return
 
+    def to_full_item(self):
+        return FullItem(
+            item_id=self.item_id,
+            service=self.service,
+            content=self.content,
+            source_id=self.source_id,
+            url=self.url,
+            image_urls=self.image_urls
+        )
+
     @classmethod
     def poll_status(cls, stage: TaskStage, status: TaskStatus, limit=0) -> Iterable[FullItem]:
-        for st in TaskStatusInfo.objects(stage=stage, stage_status=status):
+        for st in TaskStatusInfo.objects(stage=stage, stage_status=status).order_by('poll_counter'):
             item = cls.objects(service=st.service, item_id=st.item_id)[0]
-            yield FullItem(
-                item_id=item.item_id,
-                service=item.service,
-                content=item.content,
-                source_id=item.source_id,
-                url=item.url,
-                image_urls=item.image_urls
-            )
+            st.poll_counter += 1
+            st.save()
+            yield item.to_full_item()
             limit -= 1
             if limit == 0:
                 return
+
+    @classmethod
+    def abandon_tasks(cls, src_stage: TaskStage, src_status: TaskStatus, poll_limit: int, dst_stage: TaskStage, dst_status: TaskStatus):
+        TaskStatusInfo.objects(stage=src_stage, stage_status=src_status,
+                               poll_counter__gt=poll_limit).update(
+            stage=dst_stage, stage_status=dst_status
+        )
+
 
     @classmethod
     def get_status(cls, service: ServiceType, item_id: str) -> Tuple[TaskStage, TaskStatus]:
@@ -98,6 +111,10 @@ class ItemInfo(DynamicDocument):
             'failed': failed
         }
 
+    @classmethod
+    def get_item(cls, service, item_id):
+        item = cls.objects(service=service, item_id=item_id)[0]
+        return item.to_full_item()
 
     @classmethod
     def get_channels(cls, item: FullItem):
@@ -136,6 +153,7 @@ class TaskStatusInfo(DynamicDocument):
     item_id = StringField()
     stage = EnumField(TaskStage)
     stage_status = EnumField(TaskStatus)
+    poll_counter = IntField(default=0)
 
 
 class ImageCache(DynamicDocument):
@@ -143,3 +161,43 @@ class ImageCache(DynamicDocument):
     item_id = StringField()
     url = StringField()
     file = FileField()
+
+
+class SecondaryTask(DynamicDocument):
+    pull_service = EnumField(ServiceType)
+    item_id = StringField()
+    post_service = EnumField(ServiceType)
+    post_conf = StringField()
+    status = EnumField(SecondaryTaskStatus)
+    poll_counter = IntField(default=0)
+    channel = StringField()
+
+    @classmethod
+    def add_task(cls, pull_service: ServiceType, item_id: str, post_service: ServiceType, post_conf: str, channel: str):
+        cls.objects(
+            pull_service=pull_service, item_id=item_id,
+            post_service=post_service, post_conf=post_conf,
+            channel=channel
+        ).update_one(status=SecondaryTaskStatus.Queued, upsert=True)
+
+    @classmethod
+    def poll_tasks(cls, limit = 0) -> Iterable[Tuple[ServiceType, str, ServiceType, str, str]]:
+        for it in cls.objects(status=SecondaryTaskStatus.Queued).order_by('poll_counter'):
+            it.poll_counter += 1
+            it.save()
+            yield it.pull_service, it.item_id, it.post_service, it.post_conf, it.channel
+            limit -= 1
+            if limit == 0:
+                break
+
+    @classmethod
+    def close_task(cls, pull_service: ServiceType, item_id: str, post_service: ServiceType, post_conf: str, channel: str):
+        cls.objects(
+            pull_service=pull_service, item_id=item_id,
+            post_service=post_service, post_conf=post_conf,
+            channel=channel
+        ).update_one(status=SecondaryTaskStatus.Finished)
+
+    @classmethod
+    def task_done(cls, pull_service: ServiceType, item_id: str):
+        return cls.objects(pull_service=pull_service, item_id=item_id, status=SecondaryTaskStatus.Queued).count() == 0

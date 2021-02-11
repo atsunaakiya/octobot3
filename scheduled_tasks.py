@@ -4,6 +4,7 @@ from threading import Thread
 import schedule
 
 from src.models.connect import connect_db
+from src.tasks.clean_cache import clean_cache
 from src.tasks.update_index import update_index
 from src.tasks.download_images import download_images
 from src.tasks.post_images import post_images
@@ -20,6 +21,7 @@ schedule.every(17).minutes.do(async_job(update_subs))
 schedule.every(13).minutes.do(async_job(update_index))
 schedule.every(8).minutes.do(async_job(download_images))
 schedule.every(5).minutes.do(async_job(post_images))
+schedule.every(2).hours.do(async_job(clean_cache))
 
 def run_schedule():
     connect_db()

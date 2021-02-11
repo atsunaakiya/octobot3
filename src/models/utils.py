@@ -17,7 +17,7 @@ class ServiceKVStore(DynamicDocument):
 
     @classmethod
     def put(cls, service_name, key, value: Dict) -> Optional[Dict]:
-        cls.objects(service_name=service_name, key_name=key).update(value=value, upsert=True)
+        cls.objects(service_name=service_name, key_name=key).update_one(value=value, upsert=True)
 
     @classmethod
     def exists(cls, service_name, key) -> bool:
