@@ -18,7 +18,7 @@ def main():
     connect_db()
     service, func, channel = sys.argv[1:]
     service = ServiceType(service)
-    for name in SubscribeSource.get_subs_by_channel(service, func, channel):
+    for name in SubscribeSource.export_subs_by_channel(service, func, channel):
         print(name)
 
 
