@@ -1,4 +1,5 @@
 import json
+import threading
 from dataclasses import dataclass
 from functools import lru_cache
 from io import BytesIO
@@ -27,6 +28,8 @@ class WebDavConfig:
 
 SERVICE_NAME='webdav.post.service'
 
+sem = threading.Semaphore(5)
+
 class WebDavServiceBase:
     def __init__(self, conf: WebDavConfig):
         url = f"http{'s' if conf.use_https else ''}://{conf.host}:{conf.port}{conf.path}{conf.root_dir}"
@@ -48,14 +51,15 @@ class WebDavServiceBase:
         ServiceKVStore.put(SERVICE_NAME, path, {})
 
     def write_file(self, service: ServiceType, dir_name: str, filename: str, buffer: IO):
-        self.ensure_dir(service.value)
-        self.ensure_dir(f"{service.value}/{dir_name}")
-        fp = f"{service.value}/{dir_name}/{filename}"
-        with NamedTemporaryFile() as f:
-            f.write(buffer.read())
-            f.flush()
-            self.client.upload(fp, f.name)
-        return fp
+        with sem:
+            self.ensure_dir(service.value)
+            self.ensure_dir(f"{service.value}/{dir_name}")
+            fp = f"{service.value}/{dir_name}/{filename}"
+            with NamedTemporaryFile() as f:
+                f.write(buffer.read())
+                f.flush()
+                self.client.upload(fp, f.name)
+            return fp
 
 
 class WebDavService(PushService, WebDavServiceBase):
