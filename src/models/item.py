@@ -223,4 +223,4 @@ class SecondaryTask(DynamicDocument):
 
     @classmethod
     def task_done(cls, pull_service: ServiceType, item_id: str):
-        return cls.objects(pull_service=pull_service, item_id=item_id, status=SecondaryTaskStatus.Queued).count() == 0
+        return cls.objects(pull_service=pull_service, item_id=item_id, status__in=[SecondaryTaskStatus.Queued, SecondaryTaskStatus.Pending]).count() == 0
