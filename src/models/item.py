@@ -141,6 +141,12 @@ class ItemInfo(DynamicDocument):
     def exists(cls, service, item_id):
         return TaskStatusInfo.objects(service=service, item_id=item_id).count() > 0
 
+    @classmethod
+    def clean_pending_items(cls):
+        stages = [TaskStage.Fetching, TaskStage.Downloading]
+        TaskStatusInfo.objects(stage__in=stages, stage_status=TaskStatus.Pending).update(stage_status=TaskStatus.Failed)
+        SecondaryTask.objects(status=SecondaryTaskStatus.Pending).update(status=SecondaryTaskStatus.Queued)
+
 
 class ItemChannel(DynamicDocument):
     service = EnumField(ServiceType)
