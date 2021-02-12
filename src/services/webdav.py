@@ -28,8 +28,6 @@ class WebDavConfig:
 
 SERVICE_NAME='webdav.post.service'
 
-sem = threading.Semaphore(5)
-
 class WebDavServiceBase:
     def __init__(self, conf: WebDavConfig):
         url = f"http{'s' if conf.use_https else ''}://{conf.host}:{conf.port}{conf.path}{conf.root_dir}"
@@ -40,6 +38,7 @@ class WebDavServiceBase:
             'webdav_timeout': 600
         }
         self.client = Client(options)
+        self.sem = threading.Semaphore(5)
 
     def ensure_dir(self, path: str):
         if ServiceKVStore.exists(SERVICE_NAME, path):
@@ -51,7 +50,7 @@ class WebDavServiceBase:
         ServiceKVStore.put(SERVICE_NAME, path, {})
 
     def write_file(self, service: ServiceType, dir_name: str, filename: str, buffer: IO):
-        with sem:
+        with self.sem:
             self.ensure_dir(service.value)
             self.ensure_dir(f"{service.value}/{dir_name}")
             fp = f"{service.value}/{dir_name}/{filename}"
