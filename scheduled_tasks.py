@@ -25,6 +25,10 @@ schedule.every(2).hours.do(async_job(clean_cache))
 
 def run_schedule():
     connect_db()
+    async_job(update_subs)()
+    async_job(update_index)()
+    async_job(download_images)()
+    async_job(post_images)()
     while True:
         schedule.run_pending()
         time.sleep(1)
