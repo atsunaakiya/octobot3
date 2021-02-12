@@ -23,4 +23,5 @@ class TaskStatus(Enum):
 
 class SecondaryTaskStatus(Enum):
     Queued = 'queued'
+    Pending = 'pending'
     Finished = 'finished'

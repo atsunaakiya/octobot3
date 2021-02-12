@@ -16,10 +16,12 @@ config = load_config()
 def update_index():
     for item in ItemInfo.poll_status_index(TaskStage.Fetching, TaskStatus.Queued, limit=config.limit.fetch):
         service = get_service(item.service)
+        ItemInfo.set_status(item.service, item.item_id, TaskStage.Fetching, TaskStatus.Pending)
         try:
             full_item = service.pull_item(IndexItem(item.service, item.item_id))
-        except FetchFailureError as err:
+        except Exception as err:
             traceback.print_exc()
+            ItemInfo.set_status(item.service, item.item_id, TaskStage.Fetching, TaskStatus.Queued)
         else:
             print(full_item)
             ItemInfo.add_item(full_item, [])

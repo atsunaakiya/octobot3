@@ -181,6 +181,23 @@ class SecondaryTask(DynamicDocument):
         ).update_one(status=SecondaryTaskStatus.Queued, upsert=True)
 
     @classmethod
+    def acquire_task(cls, pull_service: ServiceType, item_id: str, post_service: ServiceType, post_conf: str, channel: str):
+        cls.objects(
+            pull_service=pull_service, item_id=item_id,
+            post_service=post_service, post_conf=post_conf,
+            channel=channel
+        ).update_one(status=SecondaryTaskStatus.Pending)
+
+    @classmethod
+    def release_task(cls, pull_service: ServiceType, item_id: str, post_service: ServiceType, post_conf: str, channel: str):
+        cls.objects(
+            pull_service=pull_service, item_id=item_id,
+            post_service=post_service, post_conf=post_conf,
+            channel=channel
+        ).update_one(status=SecondaryTaskStatus.Queued)
+
+
+    @classmethod
     def poll_tasks(cls, limit = 0) -> Iterable[Tuple[ServiceType, str, ServiceType, str, str]]:
         for it in cls.objects(status=SecondaryTaskStatus.Queued).order_by('poll_counter'):
             it.poll_counter += 1

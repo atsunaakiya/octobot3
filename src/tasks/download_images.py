@@ -17,6 +17,7 @@ config = load_config()
 def download_images():
     for item in ItemInfo.poll_status(TaskStage.Downloading, TaskStatus.Queued, limit=config.limit.download):
         service = get_service(item.service)
+        ItemInfo.set_status(item.service, item.item_id, TaskStage.Downloading, TaskStatus.Pending)
         try:
             for url in item.image_urls:
                 print(url)
@@ -27,8 +28,9 @@ def download_images():
                     buf.seek(0)
                     ItemInfo.save_image(item, url, buf)
                 time.sleep(1)
-        except FetchFailureError as err:
+        except Exception as err:
             traceback.print_exc()
+            ItemInfo.set_status(item.service, item.item_id, TaskStage.Downloading, TaskStatus.Queued)
         else:
             ItemInfo.set_status(item.service, item.item_id, TaskStage.Posting, TaskStatus.Queued)
     ItemInfo.abandon_tasks(TaskStage.Downloading, TaskStatus.Queued, 20, TaskStage.Downloading, TaskStatus.Failed)

@@ -19,6 +19,7 @@ def post_images():
                 SecondaryTask.add_task(item.service, item.item_id, pipe.service, pipe.config, ch)
         ItemInfo.set_status(item.service, item.item_id, TaskStage.Posting, TaskStatus.Pending)
     for stype, item_id, ptype, conf, ch in SecondaryTask.poll_tasks():
+        SecondaryTask.acquire_task(stype, item_id, ptype, conf, ch)
         print((stype.value, item_id), '=>', (ptype.value, conf))
         item = ItemInfo.get_item(stype, item_id)
         images = [BytesIO(i.read()) for i in ItemInfo.get_images(item)]
@@ -27,6 +28,7 @@ def post_images():
             client.push_item(item, images, ch)
         except Exception as err:
             traceback.print_exc()
+            SecondaryTask.release_task(stype, item_id, ptype, conf, ch)
         else:
             SecondaryTask.close_task(stype, item_id, ptype, conf, ch)
         if SecondaryTask.task_done(stype, item_id):
