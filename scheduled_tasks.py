@@ -17,8 +17,10 @@ def async_job(func):
 
     def _async():
         flag.set()
-        func()
-        flag.clear()
+        try:
+            func()
+        finally:
+            flag.clear()
 
     def _func():
         if not flag.is_set():
