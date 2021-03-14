@@ -1,5 +1,5 @@
 import time
-from threading import Thread
+from threading import Thread, Event
 
 import schedule
 
@@ -13,8 +13,19 @@ from src.tasks.update_subs import update_subs
 
 
 def async_job(func):
+    flag = Event()
+
+    def _async():
+        flag.set()
+        func()
+        flag.clear()
+
     def _func():
-        Thread(target=func).start()
+        if not flag.is_set():
+            Thread(target=_async).start()
+        else:
+            print("Task locked, ignore:", func)
+
     return _func
 
 
@@ -22,7 +33,8 @@ schedule.every(17).minutes.do(async_job(update_subs))
 schedule.every(13).minutes.do(async_job(update_index))
 schedule.every(8).minutes.do(async_job(download_images))
 schedule.every(5).minutes.do(async_job(post_images))
-schedule.every(2).hours.do(async_job(clean_cache))
+schedule.every(1).hours.do(async_job(clean_cache))
+
 
 def run_schedule():
     connect_db()
@@ -34,6 +46,7 @@ def run_schedule():
     while True:
         schedule.run_pending()
         time.sleep(1)
+
 
 if __name__ == '__main__':
     run_schedule()
