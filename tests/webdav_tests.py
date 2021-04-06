@@ -10,6 +10,7 @@ class MyTestCase(unittest.TestCase):
     def test_something(self):
         config = load_config()
         d = WebDavServiceBase(config.api[ServiceType.WebDav]['default'])
+        d.ensure_dir("overflowtest")
         d.write_file(ServiceType.Twitter, 'Strangestone', 'test.txt', BytesIO("foobar".encode('utf-8')))
 
 

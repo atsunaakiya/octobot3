@@ -6,6 +6,7 @@ from io import BytesIO
 from tempfile import TemporaryFile, NamedTemporaryFile
 from typing import Iterable, IO
 
+import webdav3
 from webdav3.client import Client
 
 from src.data import FullItem
@@ -14,6 +15,7 @@ from src.models.post import PostRecord
 from src.models.user import UserInfo
 from src.models.utils import ServiceKVStore
 from src.services.base import PushService
+import webdav3.exceptions
 
 
 @dataclass
@@ -57,7 +59,14 @@ class WebDavServiceBase:
             with NamedTemporaryFile() as f:
                 f.write(buffer.read())
                 f.flush()
-                self.client.upload(fp, f.name)
+                try:
+                    self.client.upload(fp, f.name)
+                except webdav3.exceptions.RemoteParentNotFound as err:
+                    pp = f"{service.value}/{dir_name}"
+                    assert not ServiceKVStore.exists(SERVICE_NAME, pp)
+                    self.client.mkdir(pp)
+                    ServiceKVStore.put(SERVICE_NAME, pp, {})
+                    self.client.upload(fp, f.name)
             return fp
 
 
