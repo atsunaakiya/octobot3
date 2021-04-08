@@ -1,5 +1,6 @@
 import unittest
 from io import BytesIO
+from pathlib import Path
 
 import mega
 
@@ -20,7 +21,9 @@ class MyTestCase(unittest.TestCase):
         config = load_config()
         conf: MegaConfig = config.api[ServiceType.Mega]['default']
         client = MegaService(conf)
-        client.write_file(client.root / "test.txt", BytesIO(b"Test"))
+        print(client.client.find(conf.root, exclude_deleted=True))
+        print(client.ensure_dir(Path("/FU/CK2")))
+        # client.write_file(client.root / "test2.txt", BytesIO(b"Test"))
 
 
 if __name__ == '__main__':
