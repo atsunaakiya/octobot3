@@ -99,13 +99,14 @@ class ItemInfo(DynamicDocument):
         fetching = TaskStatusInfo.objects(stage=TaskStage.Fetching, stage_status=TaskStatus.Queued).count()
         downloading = TaskStatusInfo.objects(stage=TaskStage.Downloading, stage_status=TaskStatus.Queued).count()
         posting = TaskStatusInfo.objects(stage=TaskStage.Posting, stage_status=TaskStatus.Queued).count()
+        posting_pend = TaskStatusInfo.objects(stage=TaskStage.Posting, stage_status=TaskStatus.Pending).count()
         cleaning = TaskStatusInfo.objects(stage=TaskStage.Cleaning, stage_status=TaskStatus.Queued).count()
         done = TaskStatusInfo.objects(stage=TaskStage.Done, stage_status=TaskStatus.Queued).count()
         failed = TaskStatusInfo.objects(stage_status=TaskStatus.Failed).count()
         return {
             'fetching': fetching,
             'downloading': downloading,
-            'posting': posting,
+            'posting': posting + posting_pend,
             'cleaning': cleaning,
             'done': done,
             'failed': failed
