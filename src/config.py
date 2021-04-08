@@ -54,6 +54,7 @@ class RootConfig:
     limit: LimitConfig
 
 
+
 def parse_pipeline_config(d) -> PipelineConfig:
     subscribe = []
     pull = []

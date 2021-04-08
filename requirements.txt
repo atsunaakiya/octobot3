@@ -7,3 +7,4 @@ Pillow
 python-telegram-bot
 webdavclient3
 schedule
+mega.py

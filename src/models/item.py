@@ -202,7 +202,6 @@ class SecondaryTask(DynamicDocument):
             channel=channel
         ).update_one(status=SecondaryTaskStatus.Queued)
 
-
     @classmethod
     def poll_tasks(cls, limit = 0) -> Iterable[Tuple[ServiceType, str, ServiceType, str, str]]:
         for it in cls.objects(status=SecondaryTaskStatus.Queued).order_by('poll_counter'):
@@ -220,6 +219,12 @@ class SecondaryTask(DynamicDocument):
             post_service=post_service, post_conf=post_conf,
             channel=channel
         ).update_one(status=SecondaryTaskStatus.Finished)
+
+    @classmethod
+    def migrate_task(cls, post_service1, post_conf1, post_service2, post_conf2):
+        cls.objects(
+            post_service=post_service1, post_conf=post_conf1, status=SecondaryTaskStatus.Queued
+        ).update(post_service=post_service2, post_conf=post_conf2)
 
     @classmethod
     def task_done(cls, pull_service: ServiceType, item_id: str):
