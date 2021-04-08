@@ -38,7 +38,7 @@ def parse_api(d) -> APIConfig:
         t: {
             n: config_index[t](**v)
             for n, v in d[t.value].items()
-            if t.value in d
         }
         for t in ServiceType
+        if t.value in d
     }
