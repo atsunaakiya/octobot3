@@ -21,8 +21,8 @@ class MyTestCase(unittest.TestCase):
         config = load_config()
         conf: MegaConfig = config.api[ServiceType.Mega]['default']
         client = MegaService(conf)
-        print(client.client.find(conf.root, exclude_deleted=True))
-        print(client.ensure_dir(Path("/FU/CK2")))
+        print(client.ensure_dir(Path("/xnh/b/c/d/e")))
+        print(client.client.find("/xnh/b/c/d/e", exclude_deleted=True))
         # client.write_file(client.root / "test2.txt", BytesIO(b"Test"))
 
 

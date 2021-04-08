@@ -29,12 +29,16 @@ class MegaService(PushService):
     def ensure_dir(self, path: Path):
         if path in self.dir_cache:
             return self.dir_cache[path]
-        sp = str(path)
-        folder = self.client.find(sp)
-        if folder is None:
-            folder = self.client.create_folder(sp)[path.name]
+        if not path or path == self.root:
+            parent = None
+            create_name = str(path)
         else:
-            folder = folder[0]
+            parent = self.ensure_dir(path.parent)
+            create_name = path.name
+        sp = str(path)
+        folder = self.client.find_path_descriptor(sp)
+        if folder is None:
+            folder = self.client.create_folder(create_name, parent)[path.name]
         self.dir_cache[path] = folder
         return folder
 
@@ -51,12 +55,12 @@ class MegaService(PushService):
         json_buffer = BytesIO(json.dumps(item.to_dict(), ensure_ascii=False).encode('utf-8'))
         json_fp = d / f"{item.item_id}_info.json"
         self.write_file(json_fp, json_buffer)
-        PostRecord.put_record(item.service, item.item_id, ServiceType.Mega, json_fp, channel)
+        PostRecord.put_record(item.service, item.item_id, ServiceType.Mega, str(json_fp), channel)
 
         for idx, img in enumerate(images):
             fp = d / f"{item.item_id}_{idx:03d}.png"
             self.write_file(fp, img)
-            PostRecord.put_record(item.service, item.item_id, ServiceType.Mega, fp, channel)
+            PostRecord.put_record(item.service, item.item_id, ServiceType.Mega, str(fp), channel)
 
 
 
