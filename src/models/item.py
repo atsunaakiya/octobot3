@@ -129,6 +129,7 @@ class ItemInfo(DynamicDocument):
         return [
             ImageCache.objects(service=item.service, item_id=item.item_id, url=u)[0].file
             for u in item.image_urls
+            if ImageCache.objects(service=item.service, item_id=item.item_id, url=u).count() > 0
         ]
 
     @classmethod
