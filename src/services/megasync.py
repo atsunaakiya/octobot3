@@ -43,7 +43,7 @@ class MegaService(PushService):
             f.write(buffer.read())
             f.flush()
             folder = self.ensure_dir(path.parent)
-            self.client.upload(f.name, folder[0], str(path.name))
+            self.client.upload(f.name, folder, str(path.name))
 
     def push_item(self, item: FullItem, images: Iterable[IO], channel: str):
         d = self.root / item.service.value / item.source_id
