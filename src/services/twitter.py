@@ -120,7 +120,7 @@ def status2item(s: tweepy.Status) -> TwitterItem:
         text = d['text']
     images = [
         m['media_url_https'] or m['media_url']
-        for m in d['entities'].get('media') or []
+        for m in (d.get('extended_entities') or d.get('emtities')).get('media') or []
         if m['type'] == 'photo'
     ]
     return TwitterItem(
