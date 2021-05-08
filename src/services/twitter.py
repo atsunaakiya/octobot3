@@ -1,6 +1,7 @@
 import re
 from dataclasses import dataclass
 from io import BytesIO
+from itertools import chain
 from typing import Iterable, IO, List, Tuple, Optional
 
 import requests
@@ -118,9 +119,15 @@ def status2item(s: tweepy.Status) -> TwitterItem:
         author_name, author_id = source_name, source_id
         item_id = d['id']
         text = d['text']
+    medias = chain(*[
+        d[k]['media']
+        for k in ['extended_entities', 'entities']
+        if k in d
+        if 'media' in d[k]
+    ])
     images = [
         m['media_url_https'] or m['media_url']
-        for m in (d.get('extended_entities') or d.get('emtities')).get('media') or []
+        for m in medias
         if m['type'] == 'photo'
     ]
     return TwitterItem(
