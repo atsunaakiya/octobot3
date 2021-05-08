@@ -19,7 +19,7 @@ class MyTestCase(unittest.TestCase):
         connect_db()
         config = load_config()
         conf = config.api[ServiceType.Twitter]['default']
-        res = TwitterService(conf).pull_item(IndexItem(item_id='xxx', service=ServiceType.Twitter))
+        res = TwitterService(conf).pull_item(IndexItem(item_id='1390984246781644802', service=ServiceType.Twitter))
         print(res)
 
 

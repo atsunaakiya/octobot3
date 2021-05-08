@@ -119,17 +119,18 @@ def status2item(s: tweepy.Status) -> TwitterItem:
         author_name, author_id = source_name, source_id
         item_id = d['id']
         text = d['text']
-    medias = chain(*[
-        d[k]['media']
-        for k in ['extended_entities', 'entities']
-        if k in d
-        if 'media' in d[k]
-    ])
-    images = [
-        m['media_url_https'] or m['media_url']
-        for m in medias
-        if m['type'] == 'photo'
-    ]
+
+    def get_images(key):
+        if key not in d:
+            return []
+        if 'media' not in d[key]:
+            return []
+        return [
+            m['media_url_https'] or m['media_url']
+            for m in d[key]['media']
+            if m['type'] == 'photo'
+        ]
+    images = max(map(get_images, ['extended_entities', 'entities']), key=len)
     return TwitterItem(
         retweet=retweet,
         author=(author_name, author_id),
