@@ -42,10 +42,18 @@ class WebDavServiceBase:
         self.client = Client(options)
         self.sem = threading.Semaphore(5)
 
+    def dir_exists(self, path: str):
+        try:
+            # rclone doesn't allow you check an existing dir
+            return self.client.check(path)
+        except webdav3.exceptions.MethodNotSupported as e:
+            print(e)
+            return True
+
     def ensure_dir(self, path: str):
         if ServiceKVStore.exists(SERVICE_NAME, path):
             return
-        if self.client.check(path):
+        if self.dir_exists(path):
             ServiceKVStore.put(SERVICE_NAME, path, {})
             return
         self.client.mkdir(path)
