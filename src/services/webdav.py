@@ -70,6 +70,7 @@ class WebDavServiceBase:
                 try:
                     self.client.upload(fp, f.name)
                 except webdav3.exceptions.RemoteParentNotFound as err:
+                    print(err)
                     pp = f"{service.value}/{dir_name}"
                     # assert not ServiceKVStore.exists(SERVICE_NAME, pp)
                     self.client.mkdir(pp)
