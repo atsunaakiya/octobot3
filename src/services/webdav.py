@@ -73,7 +73,12 @@ class WebDavServiceBase:
                     print(err)
                     pp = f"{service.value}/{dir_name}"
                     # assert not ServiceKVStore.exists(SERVICE_NAME, pp)
-                    self.client.mkdir(pp)
+                    # self.client.mkdir(pp)
+                    from webdav3.urn import Urn
+                    directory_urn = Urn(pp, directory=True)
+                    response = self.client.execute_request(action='mkdir', path=directory_urn.quote())
+                    assert response in (200, 201), response
+
                     ServiceKVStore.put(SERVICE_NAME, pp, {})
                     self.client.upload(fp, f.name)
             return fp

@@ -19,5 +19,10 @@ class MyTestCase(unittest.TestCase):
         print(d.dir_exists('twitter'))
         print(d.dir_exists('notexists'))
 
+    def test_create_dir(self):
+        config = load_config()
+        d = WebDavServiceBase(config.api[ServiceType.WebDav]['new'])
+        d.client.mkdir('twitter/otokonoko0964')
+
 if __name__ == '__main__':
     unittest.main()
