@@ -6,7 +6,7 @@ services:
     volumes:
     - './data:/data/db'
     mem_limit: 120m
-    command: [-m, 100M, --memory-swap, -1]
+    command: ['-m', '100M', '--memory-swap', '-1']
   init:
     image: python:3.9-slim
     volumes:
