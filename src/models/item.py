@@ -14,6 +14,12 @@ class ItemInfo(DynamicDocument):
     content = StringField()
     image_urls = ListField()
 
+    meta = {
+        'indexes': [
+            {'fields': ['+service', '+item_id']},
+        ]
+    }
+
     @classmethod
     def add_index(cls, idx: IndexItem, channels: List[str]):
         cls.objects(service=idx.service, item_id=idx.item_id).update_one(item_id=idx.item_id, upsert=True)
@@ -155,6 +161,12 @@ class ItemChannel(DynamicDocument):
     item_id = StringField()
     channel = StringField()
 
+    meta = {
+        'indexes': [
+            {'fields': ['+service', '+item_id', '+channel']},
+        ]
+    }
+
 
 class TaskStatusInfo(DynamicDocument):
     service = EnumField(ServiceType)
@@ -163,12 +175,26 @@ class TaskStatusInfo(DynamicDocument):
     stage_status = EnumField(TaskStatus)
     poll_counter = IntField(default=0)
 
+    meta = {
+        'indexes': [
+            {'fields': ['+service', '+item_id']},
+            {'fields': ['+stage', '+stage_status']},
+            {'fields': ['+stage', '+stage_status', '+poll_counter']},
+        ]
+    }
+
 
 class ImageCache(DynamicDocument):
     service = EnumField(ServiceType)
     item_id = StringField()
     url = StringField()
     file = FileField()
+
+    meta = {
+        'indexes': [
+            {'fields': ['+service', '+item_id', '+url']},
+        ]
+    }
 
 
 class SecondaryTask(DynamicDocument):
@@ -179,6 +205,16 @@ class SecondaryTask(DynamicDocument):
     status = EnumField(SecondaryTaskStatus)
     poll_counter = IntField(default=0)
     channel = StringField()
+
+    meta = {
+        'indexes': [
+            {'fields': ['+pull_service', '+item_id', '+post_service', '+post_conf', '+channel']},
+            {'fields': ['+status', '+poll_counter']},
+            {'fields': ['+status', '+poll_counter']},
+            {'fields': ['+post_service', '+post_conf', '+status']},
+            {'fields': ['+pull_service', '+item_id', '+status']},
+        ]
+    }
 
     @classmethod
     def add_task(cls, pull_service: ServiceType, item_id: str, post_service: ServiceType, post_conf: str, channel: str):

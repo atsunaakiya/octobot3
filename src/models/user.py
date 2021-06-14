@@ -10,6 +10,13 @@ class UserInfo(DynamicDocument):
     username = StringField()
     nickname = StringField()
 
+    meta = {
+        'indexes': [
+            {'fields': ['+service']},
+            {'fields': ['+service', '+username']},
+        ]
+    }
+
     @classmethod
     def set_nickname(cls, s: ServiceType, u: str, nickname: str):
         cls.objects(username=u, service=s).update_one(nickname=nickname, upsert=True)
@@ -28,6 +35,14 @@ class UserRel(DynamicDocument):
     from_user = StringField()
     to_user = StringField()
     item_id = StringField()
+
+    meta = {
+        'indexes': [
+            {'fields': ['+service', '+from_user']},
+            {'fields': ['+service', '+from_user', '+to_user']},
+            {'fields': ['+service', '+item_id']},
+        ]
+    }
 
     @classmethod
     def update_rel(cls, service: ServiceType, from_user: str, to_user: str, item_id: str):

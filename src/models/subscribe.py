@@ -10,6 +10,13 @@ class SubscribeSource(DynamicDocument):
     service_func = StringField()
     name = StringField()
 
+    meta = {
+        'indexes': [
+            {'fields': ['+service_type', '+service_func']},
+            {'fields': ['+service_type', '+service_func', '+name']},
+        ]
+    }
+
     @classmethod
     def add_subs(cls, stype: ServiceType, sfunc: str, name: str, channel: str):
         cls.objects(service_type=stype, service_func=sfunc, name=name).update_one(service_type=stype, service_func=sfunc, name=name, upsert=True)
@@ -50,12 +57,25 @@ class SubscribeChannel(DynamicDocument):
     name = StringField()
     channel = StringField()
 
+    meta = {
+        'indexes': [
+            {'fields': ['+service_type', '+service_func', '+name']},
+            {'fields': ['+service_type', '+service_func', '+channel']},
+        ]
+    }
+
 
 class MissingSubs(DynamicDocument):
     service_type = EnumField(ServiceType)
     service_func = StringField()
     name = StringField()
     reason = StringField()
+
+    meta = {
+        'indexes': [
+            {'fields': ['+service_type', '+service_func', '+name']},
+        ]
+    }
 
     @classmethod
     def report(cls, service_type, service_func, name, reason):

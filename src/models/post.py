@@ -10,6 +10,12 @@ class PostRecord(DynamicDocument):
     post_id = StringField()
     channel = StringField()
 
+    meta = {
+        'indexes': [
+            {'fields': ['+pull_service', '+pull_id', '+post_service', '+post_id', '+channel']},
+        ]
+    }
+
     @classmethod
     def put_record(cls, pull_service: ServiceType, pull_id: str, post_service: ServiceType, post_id: str, channel: str):
         cls.objects(pull_service=pull_service, pull_id=pull_id,
