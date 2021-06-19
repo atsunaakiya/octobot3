@@ -125,11 +125,13 @@ def status2item(s: tweepy.Status) -> TwitterItem:
             return []
         if 'media' not in d[key]:
             return []
-        return [
+        urls = [
             m['media_url_https'] or m['media_url']
             for m in d[key]['media']
             if m['type'] == 'photo'
         ]
+        urls = [u for u in urls if 'video_thumb' not in u]
+        return urls
     images = max(map(get_images, ['extended_entities', 'entities']), key=len)
     return TwitterItem(
         retweet=retweet,

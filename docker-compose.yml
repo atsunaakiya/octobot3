@@ -5,7 +5,7 @@ services:
     restart: always
     volumes:
     - './data:/data/db'
-    mem_limit: 120m
+    mem_limit: 200m
   init:
     image: python:3.9-slim
     volumes:
