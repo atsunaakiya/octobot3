@@ -78,7 +78,8 @@ class TwitterService(TweeterServiceBase, PullService):
 class TwitterUsernameSubs(TweeterServiceBase, SubscribeService):
     @classmethod
     def get_title(cls, name: str) -> Optional[str]:
-        return UserInfo.get_nickname(ServiceType.Twitter, name)
+        return name
+        # return UserInfo.get_nickname(ServiceType.Twitter, name)
 
     @classmethod
     def get_url(cls, name: str) -> Optional[str]:
