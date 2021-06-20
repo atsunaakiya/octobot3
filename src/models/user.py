@@ -14,6 +14,7 @@ class UserInfo(DynamicDocument):
         'indexes': [
             {'fields': ['+service']},
             {'fields': ['+service', '+username']},
+            {'fields': ['+service', '#username']},
         ]
     }
 
