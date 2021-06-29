@@ -6,6 +6,7 @@ class ServiceType(Enum):
     Telegram = 'telegram'
     WebDav = 'webdav'
     Mega = 'mega'
+    Pixiv = 'pixiv'
 
 
 class TaskStage(Enum):
