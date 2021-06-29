@@ -6,7 +6,7 @@ services:
     volumes:
     - './data:/data/db'
     mem_limit: 200m
-    command: [--wiredTigerCacheSizeGB, 0.1]
+    command: ['--wiredTigerCacheSizeGB', '0.1']
   init:
     image: python:3.9-slim
     volumes:
