@@ -50,19 +50,20 @@ class WebDavServiceBase:
             print(e)
             return True
 
-    def ensure_dir(self, path: str):
-        if ServiceKVStore.exists(SERVICE_NAME, path):
+    def ensure_dir(self, tag: str, path: str):
+        service_name = f"{SERVICE_NAME}:{tag}"
+        if ServiceKVStore.exists(service_name, path):
             return
         if self.dir_exists(path):
-            ServiceKVStore.put(SERVICE_NAME, path, {})
+            ServiceKVStore.put(service_name, path, {})
             return
         self.client.mkdir(path)
-        ServiceKVStore.put(SERVICE_NAME, path, {})
+        ServiceKVStore.put(service_name, path, {})
 
-    def write_file(self, service: ServiceType, dir_name: str, filename: str, buffer: IO):
+    def write_file(self, tag: str, service: ServiceType, dir_name: str, filename: str, buffer: IO):
         with self.sem:
-            self.ensure_dir(service.value)
-            self.ensure_dir(f"{service.value}/{dir_name}")
+            self.ensure_dir(tag, service.value)
+            self.ensure_dir(tag, f"{service.value}/{dir_name}")
             fp = f"{service.value}/{dir_name}/{filename}"
             with NamedTemporaryFile() as f:
                 f.write(buffer.read())
@@ -93,9 +94,9 @@ class WebDavService(PushService, WebDavServiceBase):
         # else:
         #     dir_name = f"{nickname}({item.source_id})"
         dir_name = item.source_id
-        fp = self.write_file(item.service, dir_name, f"{item.item_id}_info.json", json_buffer)
+        fp = self.write_file(channel, item.service, dir_name, f"{item.item_id}_info.json", json_buffer)
         PostRecord.put_record(item.service, item.item_id, ServiceType.WebDav, fp, channel)
 
         for idx, img in enumerate(images):
-            fp = self.write_file(item.service, dir_name, f"{item.item_id}_{idx:03d}.png", img)
+            fp = self.write_file(channel, item.service, dir_name, f"{item.item_id}_{idx:03d}.png", img)
             PostRecord.put_record(item.service, item.item_id, ServiceType.WebDav, fp, channel)
