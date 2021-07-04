@@ -15,19 +15,23 @@ class TelegramConfig:
     channels: List[str]
     token: str
     media_group_limit: int
+    attach_source: bool = False
 
 
 class TelegramServiceBase:
     def __init__(self, config: TelegramConfig):
         self.bot = telegram.Bot(token=config.token)
         self.channels = config.channels
+        self.config = config
 
-    def post_images(self, images: List[IO]):
+    def post_images(self, images: List[IO], source: str):
 
         media = [
             InputMediaPhoto(i)
             for i in images
         ]
+        if self.config.attach_source:
+            media[0].caption = source
         message_id = []
         for ch in self.channels:
             chat = self.bot.get_chat(ch)
@@ -39,7 +43,7 @@ class TelegramServiceBase:
 class TelegramService(PushService, TelegramServiceBase):
     def push_item(self, item: FullItem, images: List[IO], channel: str):
         for i in range(0, len(images), 10):
-            id_list = self.post_images(images[i:i+10])
+            id_list = self.post_images(images[i:i+10], item.url)
             for mid in id_list:
                 PostRecord.put_record(item.service, item.item_id, ServiceType.Telegram, mid, channel)
 
