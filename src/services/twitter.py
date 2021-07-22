@@ -55,6 +55,11 @@ class TweeterServiceBase:
         for s in l:
             yield status2item(s)
 
+    def get_user_likes(self, username) -> Iterable[TwitterItem]:
+        l: Iterable[tweepy.Status] = self.api.favorites(username)
+        for s in l:
+            yield status2item(s)
+
 
 class TwitterService(TweeterServiceBase, PullService):
     @classmethod
@@ -103,6 +108,31 @@ class TwitterUsernameSubs(TweeterServiceBase, SubscribeService):
                     yield item2fullitem(t)
             else:
                 UserRel.update_rel(ServiceType.Twitter, t.source[1], t.author[1], str(t.id))
+
+class TwitterLikeSubs(TweeterServiceBase, SubscribeService):
+    @classmethod
+    def get_title(cls, name: str) -> Optional[str]:
+        return name
+
+    @classmethod
+    def get_url(cls, name: str) -> Optional[str]:
+        return f"https://twitter.com/{name}/likes"
+
+    def subscribe_index(self, name: str) -> Iterable[IndexItem]:
+        return []
+
+    def subscribe_full(self, name: str) -> Iterable[FullItem]:
+        try:
+            tweets = list(self.get_user_likes(name))
+        except TweepError as err:
+            MissingSubs.report(ServiceType.Twitter, 'username', name, err.reason)
+            print("MISSING SUBS", 'twitter', 'username', name, err.reason)
+            return
+        for t in tweets:
+            UserInfo.set_nickname(ServiceType.Twitter, t.author[1], t.author[0])
+            if t.images:
+                UserRel.update_rel(ServiceType.Twitter, name, t.author[1], str(t.id))
+                yield item2fullitem(t)
 
 
 def status2item(s: tweepy.Status) -> TwitterItem:

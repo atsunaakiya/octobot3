@@ -6,7 +6,7 @@ from src.services.base import PullService, PushService, SubscribeService
 from src.services.megasync import MegaService, MegaConfig
 from src.services.pixiv import PixivConfig
 from src.services.telegram import TelegramService, TelegramConfig
-from src.services.twitter import TwitterService, TwitterUsernameSubs, TwitterConfig
+from src.services.twitter import TwitterService, TwitterUsernameSubs, TwitterConfig, TwitterLikeSubs
 from src.services.webdav import WebDavService, WebDavConfig
 
 config_index: Mapping[ServiceType, Callable[[Dict], Any]] = {
@@ -18,7 +18,8 @@ config_index: Mapping[ServiceType, Callable[[Dict], Any]] = {
 }
 
 subscribe_services: Mapping[Tuple[ServiceType, str], Type[SubscribeService]] = {
-    (ServiceType.Twitter, 'username'): TwitterUsernameSubs
+    (ServiceType.Twitter, 'username'): TwitterUsernameSubs,
+    (ServiceType.Twitter, 'likes'): TwitterLikeSubs
 }
 
 pull_services: Mapping[ServiceType, Type[PullService]] = {
