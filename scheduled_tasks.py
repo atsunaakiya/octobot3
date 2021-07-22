@@ -11,44 +11,21 @@ from src.tasks.download_images import download_images
 from src.tasks.post_images import post_images
 from src.tasks.update_subs import update_subs
 
+task_conf = {
+    'update_subs': (17, update_subs),
+    'update_index': (13, update_index),
+    'download_images': (8, download_images),
+    'post_images': (5, post_images),
+    'clean_cache': (60, clean_cache)
+}
 
-def async_job(func):
-    flag = Event()
-
-    def _async():
-        flag.set()
-        try:
-            func()
-        finally:
-            flag.clear()
-
-    def _func():
-        if not flag.is_set():
-            Thread(target=_async).start()
-        else:
-            print("Task locked, ignore:", func)
-
-    return _func
-
-
-schedule.every(17).minutes.do(async_job(update_subs))
-schedule.every(13).minutes.do(async_job(update_index))
-schedule.every(8).minutes.do(async_job(download_images))
-schedule.every(5).minutes.do(async_job(post_images))
-schedule.every(1).hours.do(async_job(clean_cache))
-
-
-def run_schedule():
+def run_schedule(task):
+    minutes, func = task_conf[task]
     connect_db()
     ItemInfo.clean_pending_items()
-    async_job(update_subs)()
-    async_job(update_index)()
-    async_job(download_images)()
-    async_job(post_images)()
+    schedule.every(minutes).minutes.do(func)
+    func()
     while True:
         schedule.run_pending()
-        time.sleep(1)
+        time.sleep(60)
 
-
-if __name__ == '__main__':
-    run_schedule()

@@ -7,12 +7,6 @@ services:
     - './data:/data/db'
     mem_limit: 200m
     command: ['--wiredTigerCacheSizeGB', '0.1']
-  init:
-    image: python:3.9-slim
-    volumes:
-      - '.:/app'
-    working_dir: '/app'
-    command: [ ./scripts/deps.sh ]
   server:
     ports:
       - '18023:8000'
@@ -23,11 +17,43 @@ services:
     depends_on:
       - 'mongo'
     command: [ ./scripts/task.sh, server ]
-  cron:
+  update_subs:
     image: python:3.9-slim
     volumes:
       - '.:/app'
     working_dir: '/app'
     depends_on:
       - 'mongo'
-    command: [ ./scripts/task.sh, cron ]
+    command: [ ./scripts/task.sh, cron, update_subs]
+  update_index:
+    image: python:3.9-slim
+    volumes:
+      - '.:/app'
+    working_dir: '/app'
+    depends_on:
+      - 'mongo'
+    command: [ ./scripts/task.sh, cron, update_index ]
+  download_images:
+    image: python:3.9-slim
+    volumes:
+      - '.:/app'
+    working_dir: '/app'
+    depends_on:
+      - 'mongo'
+    command: [ ./scripts/task.sh, cron, download_images ]
+  post_images:
+    image: python:3.9-slim
+    volumes:
+      - '.:/app'
+    working_dir: '/app'
+    depends_on:
+      - 'mongo'
+    command: [ ./scripts/task.sh, cron, post_images ]
+  clean_cache:
+    image: python:3.9-slim
+    volumes:
+      - '.:/app'
+    working_dir: '/app'
+    depends_on:
+      - 'mongo'
+    command: [ ./scripts/task.sh, cron, clean_cache ]

@@ -13,7 +13,8 @@ def main():
     if cmd == 'server':
         launch()
     elif cmd == 'cron':
-        run_schedule()
+        task = sys.argv[2]
+        run_schedule(task)
     elif cmd == 'update_index':
         connect_db()
         update_index()
