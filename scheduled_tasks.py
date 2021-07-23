@@ -1,4 +1,6 @@
 import time
+import traceback
+from functools import partial
 from threading import Thread, Event
 
 import schedule
@@ -19,8 +21,16 @@ task_conf = {
     'clean_cache': (60, clean_cache)
 }
 
+def try_to_run(func):
+    try:
+        func()
+    except:
+        traceback.print_exc()
+
+
 def run_schedule(task):
     minutes, func = task_conf[task]
+    func = partial(try_to_run, func)
     connect_db()
     ItemInfo.clean_pending_items()
     schedule.every(minutes).minutes.do(func)
