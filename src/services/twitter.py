@@ -101,8 +101,8 @@ class TwitterUsernameSubs(TweeterServiceBase, SubscribeService):
             print("MISSING SUBS", 'twitter', 'username', name, err.reason)
             return
         for t in tweets:
-            UserInfo.set_nickname(ServiceType.Twitter, t.author[1], t.author[0])
-            UserInfo.set_nickname(ServiceType.Twitter, t.source[1], t.source[0])
+            # UserInfo.set_nickname(ServiceType.Twitter, t.author[1], t.author[0])
+            # UserInfo.set_nickname(ServiceType.Twitter, t.source[1], t.source[0])
             if t.author[1] == name:
                 if t.images:
                     yield item2fullitem(t)
