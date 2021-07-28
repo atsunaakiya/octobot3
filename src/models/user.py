@@ -13,8 +13,7 @@ class UserInfo(DynamicDocument):
     meta = {
         'indexes': [
             {'fields': ['+service']},
-            {'fields': ['+service', '+username']},
-            {'fields': ['+service', '#username']},
+            {'fields': ['+service', '+username']}
         ]
     }
 
