@@ -14,7 +14,7 @@ from src.tasks.post_images import post_images
 from src.tasks.update_subs import update_subs
 
 task_conf = {
-    'update_subs': (17, update_subs),
+    'update_subs': (57, update_subs),
     'update_index': (13, update_index),
     'download_images': (8, download_images),
     'post_images': (5, post_images),

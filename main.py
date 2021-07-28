@@ -6,6 +6,7 @@ from src.tasks.download_images import download_images
 from src.tasks.post_images import post_images
 from src.tasks.server import launch
 from src.tasks.update_index import update_index
+from src.tasks.update_subs import update_subs
 
 
 def main():
@@ -15,6 +16,9 @@ def main():
     elif cmd == 'cron':
         task = sys.argv[2]
         run_schedule(task)
+    elif cmd == 'update_subs':
+        connect_db()
+        update_subs()
     elif cmd == 'update_index':
         connect_db()
         update_index()
