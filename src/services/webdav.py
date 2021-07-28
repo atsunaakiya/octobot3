@@ -27,6 +27,7 @@ class WebDavConfig:
     password: str
     path: str
     root_dir: str
+    force_direct: bool = False
 
 SERVICE_NAME='webdav.post.service'
 
@@ -40,6 +41,8 @@ class WebDavServiceBase:
             'webdav_timeout': 600
         }
         self.client = Client(options)
+        if conf.force_direct:
+            self.client.session.proxies = {}
         self.sem = threading.Semaphore(5)
 
     def dir_exists(self, path: str):
