@@ -1,9 +1,6 @@
 import time
 import traceback
 from functools import partial
-from threading import Thread, Event
-
-import schedule
 
 from src.models.connect import connect_db
 from src.models.item import ItemInfo
@@ -24,6 +21,8 @@ task_conf = {
 def try_to_run(func):
     try:
         func()
+    except KeyboardInterrupt as err:
+        raise err
     except:
         traceback.print_exc()
 
@@ -33,9 +32,11 @@ def run_schedule(task):
     func = partial(try_to_run, func)
     connect_db()
     ItemInfo.clean_pending_items()
-    schedule.every(minutes).minutes.do(func)
-    func()
     while True:
-        schedule.run_pending()
-        time.sleep(60)
+        try:
+            func()
+        except KeyboardInterrupt:
+            break
+        time.sleep(minutes * 60)
+
 
