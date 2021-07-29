@@ -155,6 +155,10 @@ class ItemInfo(DynamicDocument):
         TaskStatusInfo.objects(stage__in=stages, stage_status=TaskStatus.Pending).update(stage_status=TaskStatus.Failed)
         SecondaryTask.objects(status=SecondaryTaskStatus.Pending).update(status=SecondaryTaskStatus.Queued)
 
+        for t in TaskStatusInfo.objects(stage=TaskStage.Posting, stage_status=TaskStatus.Queued):
+            if SecondaryTask.task_done(t.service, t.item_id):
+                ItemInfo.set_status(t.service, t.item_id, TaskStage.Cleaning, TaskStatus.Queued)
+                print("Cleaning finished task:", t.service, t.item_id)
 
 class ItemChannel(DynamicDocument):
     service = EnumField(ServiceType)
