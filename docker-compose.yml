@@ -25,7 +25,6 @@ services:
       - '.:/app'
     working_dir: '/app'
     restart: unless-stopped
-    mem_limit: 30m
     env_file: [octo.env]
     depends_on:
       - 'mongo'
@@ -36,7 +35,6 @@ services:
       - '.:/app'
     working_dir: '/app'
     restart: unless-stopped
-    mem_limit: 30m
     env_file: [octo.env]
     depends_on:
       - 'mongo'
@@ -47,7 +45,6 @@ services:
       - '.:/app'
     working_dir: '/app'
     restart: unless-stopped
-    mem_limit: 30m
     env_file: [octo.env]
     depends_on:
       - 'mongo'
@@ -58,7 +55,6 @@ services:
       - '.:/app'
     working_dir: '/app'
     restart: unless-stopped
-    mem_limit: 30m
     env_file: [octo.env]
     depends_on:
       - 'mongo'
@@ -69,7 +65,6 @@ services:
       - '.:/app'
     working_dir: '/app'
     restart: unless-stopped
-    mem_limit: 30m
     env_file: [octo.env]
     depends_on:
       - 'mongo'
