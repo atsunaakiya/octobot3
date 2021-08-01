@@ -10,7 +10,7 @@ from src.services import PushService
 
 @dataclass
 class LocalConfig:
-    root: str = 'external'
+    root: str = '/external'
 
 
 class LocalService(PushService):

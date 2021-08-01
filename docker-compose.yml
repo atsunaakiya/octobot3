@@ -53,6 +53,7 @@ services:
     image: python:3.9-slim
     volumes:
       - '.:/app'
+      - '${EXTERNAL_ROOT:-./external}:/external'
     working_dir: '/app'
     restart: unless-stopped
     env_file: [octo.env]
