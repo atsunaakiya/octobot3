@@ -23,7 +23,7 @@ class LocalService(PushService):
         parent.mkdir(parents=True, exist_ok=True)
         meta_file = parent / f"{item.item_id}_info.json"
         json.dump(item.to_dict(), meta_file.open('w'), ensure_ascii=False)
-        for idx, buf in images:
+        for idx, buf in enumerate(images):
             fp = parent / f"{item.item_id}_{idx:03d}.png"
             with fp.open('wb') as f:
                 f.write(buf.read())
