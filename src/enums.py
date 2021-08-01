@@ -7,6 +7,7 @@ class ServiceType(Enum):
     WebDav = 'webdav'
     Mega = 'mega'
     Pixiv = 'pixiv'
+    Local = 'local'
 
 
 class TaskStage(Enum):

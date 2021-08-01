@@ -9,3 +9,5 @@
 .DS_Store
 /*.bak.txt
 octo.env
+.env
+/external
