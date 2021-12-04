@@ -7,6 +7,14 @@ services:
     - './data:/data/db'
     mem_limit: 200m
     command: ['--wiredTigerCacheSizeGB', '0.1']
+  testing:
+    image: python:3.9-slim
+    volumes:
+      - '.:/app'
+    restart: unless-stopped
+    working_dir: '/app'
+    env_file: [octo.env]
+    entrypoint: '/app/venv/bin/python'
   server:
     ports:
       - '18023:8000'
