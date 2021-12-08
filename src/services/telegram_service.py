@@ -38,9 +38,8 @@ class TelegramServiceBase:
             width = int(width * scale)
             height = int(height * scale)
             img = img.resize((width, height))
-        img = img.convert('RGB')
         buf = BytesIO()
-        img.save(buf, format="JPEG")
+        img.save(buf, format="PNG")
         buf.seek(0)
         time.sleep(2)
         return buf
