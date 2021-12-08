@@ -40,6 +40,8 @@ class TelegramServiceBase:
             scale = edge_limit / max_edge
             width = int(width * scale)
             height = int(height * scale)
+            if min(width, height) < 5:
+                return None
             img = img.resize((width, height))
         buf = BytesIO()
         img.save(buf, format="PNG")
@@ -49,10 +51,15 @@ class TelegramServiceBase:
 
     def post_images(self, images: List[IO], source: str):
         media = [
-            InputMediaPhoto(self.resize_image(i, 1000))
+            self.resize_image(i, 1000)
             for i in images
         ]
-        if self.config.attach_source:
+        media = [
+            InputMediaPhoto(i)
+            for i in media
+            if i is not None
+        ]
+        if self.config.attach_source and len(media) > 0:
             media[0].caption = source
         message_id = []
         for ch in self.channels:
