@@ -23,6 +23,8 @@ def post_images():
         print((stype.value, item_id), '=>', (ptype.value, conf))
         item = ItemInfo.get_item(stype, item_id)
         images = [BytesIO(i.read()) for i in ItemInfo.get_images(item)]
+        if not service_exists(ptype, conf):
+            continue
         client = get_service(ptype, conf)
         converted_username = pull_services[item.service].convert_username(item.source_id)
         try:
@@ -36,7 +38,12 @@ def post_images():
             print("Post Done", (item.service, item.item_id))
             ItemInfo.set_status(item.service, item.item_id, TaskStage.Cleaning, TaskStatus.Queued)
 
-
+def service_exists(stype: ServiceType, conf: str):
+    s = config.api.get(stype)
+    if s is None:
+        return False
+    c = s.get(conf)
+    return c is not None
 
 @lru_cache()
 def get_service(stype: ServiceType, conf: str):
