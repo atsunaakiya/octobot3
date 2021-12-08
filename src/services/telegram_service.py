@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from io import BytesIO
 from typing import List, Iterable, IO
 
 import telegram
@@ -8,6 +9,7 @@ from src.data import FullItem
 from src.enums import ServiceType
 from src.models.post import PostRecord
 from src.services.base import PushService
+from PIL import Image
 
 
 @dataclass
@@ -24,10 +26,25 @@ class TelegramServiceBase:
         self.channels = config.channels
         self.config = config
 
-    def post_images(self, images: List[IO], source: str):
+    @staticmethod
+    def resize_image(image_io):
+        edge_limit = 1000
+        img = Image.open(image_io)
+        width, height = img.size
+        max_edge = max(width, height)
+        if max_edge > edge_limit:
+            scale = edge_limit / max_edge
+            width = int(width * scale)
+            height = int(height * scale)
+            img = img.resize((width, height))
+        buf = BytesIO()
+        img.save(buf, format="JPEG")
+        buf.seek(0)
+        return buf
 
+    def post_images(self, images: List[IO], source: str):
         media = [
-            InputMediaPhoto(i)
+            InputMediaPhoto(self.resize_image(i))
             for i in images
         ]
         if self.config.attach_source:
