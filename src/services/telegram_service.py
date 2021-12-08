@@ -1,3 +1,4 @@
+import time
 from dataclasses import dataclass
 from io import BytesIO
 from typing import List, Iterable, IO
@@ -55,6 +56,7 @@ class TelegramServiceBase:
             chat = self.bot.get_chat(ch)
             messages = chat.send_media_group(media)
             message_id.extend([str(m.message_id) for m in messages])
+        time.sleep(5)
         return message_id
 
 
