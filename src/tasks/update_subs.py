@@ -11,6 +11,8 @@ from src.services import subscribe_services
 def update_subs():
     config = load_config()
     for (stype, sfunc), service_type in subscribe_services.items():
+        if stype not in config.api:
+            continue
         service_conf = list(config.api[stype].values())[0]
         service = service_type(service_conf)
         for name, channels in SubscribeSource.get_subs(stype, sfunc):

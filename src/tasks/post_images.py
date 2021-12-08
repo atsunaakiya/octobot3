@@ -6,7 +6,7 @@ from src.config import load_config
 from src.enums import TaskStatus, TaskStage, ServiceType
 from src.models.connect import connect_db
 from src.models.item import ItemInfo, SecondaryTask
-from src.services import push_services
+from src.services import push_services, pull_services
 
 config = load_config()
 
@@ -24,8 +24,9 @@ def post_images():
         item = ItemInfo.get_item(stype, item_id)
         images = [BytesIO(i.read()) for i in ItemInfo.get_images(item)]
         client = get_service(ptype, conf)
+        converted_username = pull_services[item.service].convert_username(item.source_id)
         try:
-            client.push_item(item, images, ch)
+            client.push_item(item, images, ch, converted_username)
         except Exception as err:
             traceback.print_exc()
             SecondaryTask.release_task(stype, item_id, ptype, conf, ch)

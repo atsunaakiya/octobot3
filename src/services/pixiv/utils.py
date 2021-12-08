@@ -19,13 +19,16 @@ class PixivUser:
     name: str
     id: int
 
+
 @dataclasses.dataclass
 class PixivIllustrate:
+    id: int
     title: str
     description: str
     tags: List[str]
     images: List[str]
-    author_username: str
+    author_id: int
+
 
 class PixivAPI:
     def __init__(self, sess: requests.Session):
@@ -60,14 +63,22 @@ class PixivAPI:
             p['urls']['original']
             for p in pages['body']
         ]
-        username = data['userName']
+        user_id = int(data['userId'])
         return PixivIllustrate(
+            id=uid,
             title=title,
             description=desc,
             tags=tags,
             images=urls,
-            author_username=username
+            author_id=user_id
         )
+
+    def user_illustrates(self, uid: int):
+        url = f'https://www.pixiv.net/ajax/user/{uid}/profile/all?lang=zh'
+        data = self.sess.get(url).json()
+        data = data['body']
+        id_list = list(data['illusts'].keys()) + list(data['manga'].keys())
+        return id_list
 
     def download_image(self, url):
         headers = {
@@ -115,8 +126,18 @@ class PixivAPITest(unittest.TestCase):
 
     def test_illustrate(self):
         data = self.api.get_illustrate(87622911)
+        print(data)
         image_data = self.api.download_image(data.images[0])
         with (test_dir / 'illustrate_test.jpg').open('wb') as f:
+            shutil.copyfileobj(image_data, f)
+
+    def test_user_illustrates(self):
+        data = self.api.user_illustrates(6210796)
+        print(data)
+
+    def test_just_image(self):
+        image_data = self.api.download_image('https://i.pximg.net/img-original/img/2021/02/11/17/35/32/87687896_p0.png')
+        with (test_dir / 'illustrate_test2.jpg').open('wb') as f:
             shutil.copyfileobj(image_data, f)
 
     def test_bookmarks(self):

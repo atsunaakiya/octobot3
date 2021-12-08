@@ -119,7 +119,7 @@ class ItemInfo(DynamicDocument):
         }
 
     @classmethod
-    def get_item(cls, service, item_id):
+    def get_item(cls, service, item_id) -> FullItem:
         item = cls.objects(service=service, item_id=item_id)[0]
         return item.to_full_item()
 

@@ -49,7 +49,7 @@ class MegaService(PushService):
             folder = self.ensure_dir(path.parent)
             self.client.upload(f.name, folder, str(path.name))
 
-    def push_item(self, item: FullItem, images: Iterable[IO], channel: str):
+    def push_item(self, item: FullItem, images: Iterable[IO], channel: str, converted_username: str):
         d = self.root / item.service.value / item.source_id
         self.ensure_dir(d)
         json_buffer = BytesIO(json.dumps(item.to_dict(), ensure_ascii=False).encode('utf-8'))

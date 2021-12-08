@@ -89,7 +89,7 @@ class WebDavServiceBase:
 
 
 class WebDavService(PushService, WebDavServiceBase):
-    def push_item(self, item: FullItem, images: Iterable[IO], channel: str):
+    def push_item(self, item: FullItem, images: Iterable[IO], channel: str, converted_username: str):
         json_buffer = BytesIO(json.dumps(item.to_dict(), ensure_ascii=False).encode('utf-8'))
         # nickname = UserInfo.get_nickname(item.service, item.source_id)
         # if nickname is None:

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
 
 from src.enums import ServiceType
 
@@ -13,6 +13,7 @@ class FullItem:
     content: str
     image_urls: List[str]
     url: str
+    tags: Optional[List[str]] = None
 
     def to_dict(self):
         return {
