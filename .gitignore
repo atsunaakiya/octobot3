@@ -11,3 +11,5 @@
 octo.env
 .env
 /external
+/cookies
+/test_data

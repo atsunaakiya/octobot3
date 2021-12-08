@@ -4,9 +4,9 @@ from typing import Callable, Any, Mapping, Tuple, Type, Dict
 from src.enums import ServiceType
 from src.services.base import PullService, PushService, SubscribeService
 from src.services.local import LocalService, LocalConfig
-from src.services.megasync import MegaService, MegaConfig
+# from src.services.megasync import MegaService, MegaConfig
 from src.services.pixiv import PixivConfig
-from src.services.telegram import TelegramService, TelegramConfig
+from src.services.telegram_service import TelegramService, TelegramConfig
 from src.services.twitter import TwitterService, TwitterUsernameSubs, TwitterConfig, TwitterLikeSubs
 from src.services.webdav import WebDavService, WebDavConfig
 
@@ -14,7 +14,7 @@ config_index: Mapping[ServiceType, Callable[[Dict], Any]] = {
     ServiceType.Twitter: TwitterConfig,
     ServiceType.Telegram: TelegramConfig,
     ServiceType.WebDav: WebDavConfig,
-    ServiceType.Mega: MegaConfig,
+    # ServiceType.Mega: MegaConfig,
     ServiceType.Pixiv: PixivConfig,
     ServiceType.Local: LocalConfig
 }
@@ -31,7 +31,7 @@ pull_services: Mapping[ServiceType, Type[PullService]] = {
 push_services: Mapping[ServiceType, Type[PushService]] = {
     ServiceType.WebDav: WebDavService,
     ServiceType.Telegram: TelegramService,
-    ServiceType.Mega: MegaService,
+    # ServiceType.Mega: MegaService,
     ServiceType.Local: LocalService
 }
 

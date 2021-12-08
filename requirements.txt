@@ -1,7 +1,7 @@
 flask
 mongoengine
 toml
-tweepy
+tweepy==3.10.0
 typeguard
 Pillow
 python-telegram-bot
