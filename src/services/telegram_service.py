@@ -66,4 +66,5 @@ class TelegramService(PushService, TelegramServiceBase):
         id_list = self.post_images(images[:10], item.url)
         for mid in id_list:
             PostRecord.put_record(item.service, item.item_id, ServiceType.Telegram, mid, channel)
+        time.sleep(15)
 
