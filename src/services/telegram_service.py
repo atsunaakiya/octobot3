@@ -42,6 +42,7 @@ class TelegramServiceBase:
         buf = BytesIO()
         img.save(buf, format="JPEG")
         buf.seek(0)
+        time.sleep(2)
         return buf
 
     def post_images(self, images: List[IO], source: str):
