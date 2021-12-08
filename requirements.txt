@@ -8,4 +8,4 @@ python-telegram-bot
 webdavclient3
 schedule
 mega.py
-pixivpy==3.10.0
+pyquery
