@@ -63,8 +63,7 @@ class TelegramServiceBase:
 
 class TelegramService(PushService, TelegramServiceBase):
     def push_item(self, item: FullItem, images: List[IO], channel: str, converted_username: str):
-        for i in range(0, len(images), 10):
-            id_list = self.post_images(images[i:i+10], item.url)
-            for mid in id_list:
-                PostRecord.put_record(item.service, item.item_id, ServiceType.Telegram, mid, channel)
+        id_list = self.post_images(images[:10], item.url)
+        for mid in id_list:
+            PostRecord.put_record(item.service, item.item_id, ServiceType.Telegram, mid, channel)
 
