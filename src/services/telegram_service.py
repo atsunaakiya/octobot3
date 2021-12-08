@@ -1,8 +1,10 @@
 import time
+import unittest
 from dataclasses import dataclass
 from io import BytesIO
 from typing import List, Iterable, IO
 
+import PIL.Image
 import telegram
 from telegram import InputMediaPhoto
 
@@ -11,6 +13,8 @@ from src.enums import ServiceType
 from src.models.post import PostRecord
 from src.services.base import PushService
 from PIL import Image
+
+from src.utils.project_path import test_dir
 
 
 @dataclass
@@ -28,8 +32,7 @@ class TelegramServiceBase:
         self.config = config
 
     @staticmethod
-    def resize_image(image_io):
-        edge_limit = 1000
+    def resize_image(image_io, edge_limit):
         img = Image.open(image_io)
         width, height = img.size
         max_edge = max(width, height)
@@ -46,7 +49,7 @@ class TelegramServiceBase:
 
     def post_images(self, images: List[IO], source: str):
         media = [
-            InputMediaPhoto(self.resize_image(i))
+            InputMediaPhoto(self.resize_image(i, 1000))
             for i in images
         ]
         if self.config.attach_source:
@@ -66,4 +69,3 @@ class TelegramService(PushService, TelegramServiceBase):
         for mid in id_list:
             PostRecord.put_record(item.service, item.item_id, ServiceType.Telegram, mid, channel)
         time.sleep(15)
-
