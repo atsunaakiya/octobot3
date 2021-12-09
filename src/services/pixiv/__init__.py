@@ -102,7 +102,7 @@ class PixivSearchSubs(PixivServiceBase, SubscribeService):
             yield IndexItem(ServiceType.Pixiv, str(uid))
 
     def subscribe_full(self, name: str) -> Iterable[FullItem]:
-        pass
+        return []
 
     @classmethod
     def get_title(cls, name: str) -> Optional[str]:
