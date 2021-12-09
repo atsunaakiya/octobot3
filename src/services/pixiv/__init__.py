@@ -53,8 +53,8 @@ class PixivService(PixivServiceBase, PullService):
 
     @classmethod
     def parse_item_id(cls, url) -> Optional[str]:
-        res = re.search(r'pixiv\.net/artworks/(\d+)', url)
-        return res and res.group(1)
+        res = re.search(r'pixiv\.net/(\w+/)?artworks/(\d+)', url)
+        return res and res.group(2)
 
     @classmethod
     def convert_username(cls, name: str):
