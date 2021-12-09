@@ -51,14 +51,14 @@
             <tr>
                 <td>
                     {% if url %}
-                        <a class="entry" href="{{ url }}" target="_blank">{{ id or title }}</a>
+                        <a class="entry" href="{{ url }}" target="_blank">{{ title or id }}</a>
                     {% else %}
-                        <span class="entry" >{{ id or title }}</span>
+                        <span class="entry" >{{ title or id }}</span>
                     {% endif %}
                 </td>
                 <td>
                     <form action="/pipeline/{{ pipeline_name }}/subs/delete" method="post"
-                          onsubmit="return confirm('Delete {{ id or title }}?');">
+                          onsubmit="return confirm('Delete {{ title or id }}?');">
                         <input type="hidden" name="service" value="{{ service_type }}">
                         <input type="hidden" name="func" value="{{ service_func }}">
                         <input type="hidden" name="name" value="{{ id }}">

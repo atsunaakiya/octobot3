@@ -76,7 +76,7 @@ class PixivIllustSubs(PixivServiceBase, SubscribeService):
 
     @classmethod
     def get_url(cls, name: str) -> Optional[str]:
-        return f'https://www.pixiv.net/users/{name}/artworks'
+        return f'https://www.pixiv.net/users/{name}/illustrations'
 
 
 class PixivLikeSubs(PixivServiceBase, SubscribeService):
@@ -106,7 +106,7 @@ class PixivSearchSubs(PixivServiceBase, SubscribeService):
 
     @classmethod
     def get_title(cls, name: str) -> Optional[str]:
-        return PixivService.convert_username(name)
+        return name
 
     @classmethod
     def get_url(cls, name: str) -> Optional[str]:
