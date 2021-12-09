@@ -22,7 +22,12 @@ class LocalService(PushService):
         parent = self.root / item.service.value / converted_username
         parent.mkdir(parents=True, exist_ok=True)
         meta_file = parent / f"{item.item_id}_info.json"
-        json.dump(item.to_dict(), meta_file.open('w'), ensure_ascii=False)
+        with meta_file.open('w') as f:
+            json.dump(item.to_dict(), f, ensure_ascii=False)
+        if len(item.content) > 100:
+            content_file = parent / f"{item.item_id}_content.txt"
+            with content_file.open('w') as f:
+                f.write(item.content)
         for idx, buf in enumerate(images):
             fp = parent / f"{item.item_id}_{idx:03d}.png"
             with fp.open('wb') as f:
