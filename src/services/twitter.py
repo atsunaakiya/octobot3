@@ -65,7 +65,7 @@ class TwitterService(TweeterServiceBase, PullService):
     @classmethod
     def parse_item_id(cls, url) -> Optional[str]:
         res = re.search(r"https?://twitter\.com/\w+/status/(\d+)", url)
-        if url is not None:
+        if res is not None:
             return res.group(1)
 
     def pull_item(self, idx: IndexItem) -> FullItem:
