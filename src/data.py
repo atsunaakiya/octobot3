@@ -22,7 +22,8 @@ class FullItem:
             'source_id': self.source_id,
             'content': self.content,
             'image_urls': self.image_urls,
-            'url': self.url
+            'url': self.url,
+            'tags': self.tags
         }
 
 

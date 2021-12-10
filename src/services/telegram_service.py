@@ -1,10 +1,8 @@
 import time
-import unittest
 from dataclasses import dataclass
 from io import BytesIO
-from typing import List, Iterable, IO
+from typing import List, IO
 
-import PIL.Image
 import telegram
 from telegram import InputMediaPhoto
 
@@ -14,8 +12,6 @@ from src.models.post import PostRecord
 from src.services.base import PushService
 from PIL import Image
 
-from src.utils.project_path import test_dir
-
 
 @dataclass
 class TelegramConfig:
@@ -23,6 +19,7 @@ class TelegramConfig:
     token: str
     media_group_limit: int
     attach_source: bool = False
+    simple_notification: bool = False
 
 
 class TelegramServiceBase:
@@ -49,6 +46,10 @@ class TelegramServiceBase:
         time.sleep(2)
         return buf
 
+    def simple_notify(self, url):
+        for chat_id in self.config.channels:
+            self.bot.send_message(chat_id, f'Done: {url}')
+
     def post_images(self, images: List[IO], source: str):
         media = [
             self.resize_image(i, 1000)
@@ -72,6 +73,10 @@ class TelegramServiceBase:
 
 class TelegramService(PushService, TelegramServiceBase):
     def push_item(self, item: FullItem, images: List[IO], channel: str, converted_username: str):
+        if self.config.simple_notification:
+            self.simple_notify(item.url)
+            return
+
         id_list = self.post_images(images[:10], item.url)
         for mid in id_list:
             PostRecord.put_record(item.service, item.item_id, ServiceType.Telegram, mid, channel)

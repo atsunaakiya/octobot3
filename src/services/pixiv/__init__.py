@@ -45,7 +45,8 @@ class PixivService(PixivServiceBase, PullService):
             source_id=str(data.author_id),
             content=content,
             image_urls=data.images,
-            url=f"https://www.pixiv.net/artworks/{index_item.item_id}"
+            url=f"https://www.pixiv.net/artworks/{index_item.item_id}",
+            tags=data.tags
         )
 
     def download_item_image(self, item: FullItem, url: str) -> IO:
