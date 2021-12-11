@@ -44,6 +44,7 @@ class PixivAPI:
             data = json.loads(data)
         except TypeError as err:
             print(f'data={repr(data)}')
+            print(res.text)
             raise err
         except JSONDecodeError as err:
             print(data)
