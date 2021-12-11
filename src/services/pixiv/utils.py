@@ -4,6 +4,7 @@ import shutil
 import unittest
 import urllib.parse
 from io import BytesIO
+from json import JSONDecodeError
 from typing import List, Optional
 
 import requests
@@ -39,7 +40,14 @@ class PixivAPI:
         res = self.sess.get(url)
         doc = pq(res.text)
         data = doc('#meta-preload-data').attr('content')
-        data = json.loads(data)
+        try:
+            data = json.loads(data)
+        except TypeError as err:
+            print(f'data={repr(data)}')
+            raise err
+        except JSONDecodeError as err:
+            print(data)
+            raise err
         return data
 
     def get_user(self, uid: int):
