@@ -24,8 +24,11 @@ def update_index():
             ItemInfo.set_status(item.service, item.item_id, TaskStage.Fetching, TaskStatus.Queued)
         else:
             print(full_item)
-            ItemInfo.add_item(full_item, [])
-            ItemInfo.set_status(item.service, item.item_id, TaskStage.Downloading, TaskStatus.Queued)
+            if full_item is None:
+                ItemInfo.set_status(item.service, item.item_id, TaskStage.Fetching, TaskStatus.Failed)
+            else:
+                ItemInfo.add_item(full_item, [])
+                ItemInfo.set_status(item.service, item.item_id, TaskStage.Downloading, TaskStatus.Queued)
         time.sleep(1)
     ItemInfo.abandon_tasks(TaskStage.Fetching, TaskStatus.Queued, 20, TaskStage.Fetching, TaskStatus.Failed)
 

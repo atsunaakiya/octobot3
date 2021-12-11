@@ -42,10 +42,12 @@ class TweeterServiceBase:
 
         self.api = tweepy.API(auth)
 
-    def get_status(self, sid) -> TwitterItem:
+    def get_status(self, sid) -> Optional[TwitterItem]:
         try:
             status = self.api.get_status(int(sid))
         except TweepError as err:
+            if err.reason[0]['message'] == 'No status found with that ID.':
+                return None
             raise FetchFailureError(err.reason) from err
         else:
             return status2item(status)
@@ -68,8 +70,11 @@ class TwitterService(TweeterServiceBase, PullService):
         if res is not None:
             return res.group(1)
 
-    def pull_item(self, idx: IndexItem) -> FullItem:
-        return item2fullitem(self.get_status(idx.item_id))
+    def pull_item(self, idx: IndexItem) -> Optional[FullItem]:
+        tweet = self.get_status(idx.item_id)
+        if tweet is None:
+            return None
+        return item2fullitem(tweet)
 
     def download_item_image(self, item: FullItem, url: str) -> IO:
         try:
