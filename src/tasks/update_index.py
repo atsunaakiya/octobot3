@@ -23,7 +23,7 @@ def update_index():
             traceback.print_exc()
             ItemInfo.set_status(item.service, item.item_id, TaskStage.Fetching, TaskStatus.Queued)
         else:
-            print(item.url, full_item)
+            print(item, full_item)
             if full_item is None:
                 ItemInfo.set_status(item.service, item.item_id, TaskStage.Fetching, TaskStatus.Failed)
             else:
