@@ -40,11 +40,16 @@ class PixivAPI:
         res = self.sess.get(url)
         doc = pq(res.text)
         data = doc('#meta-preload-data').attr('content')
+        if data is None:
+            if doc('.error-message'):
+                return None
+            else:
+                raise ValueError('Pixiv Page Changed')
         try:
             data = json.loads(data)
         except TypeError as err:
             print(f'data={repr(data)}')
-            print(res.text)
+            # print(res.text)
             raise err
         except JSONDecodeError as err:
             print(data)
@@ -60,6 +65,8 @@ class PixivAPI:
 
     def get_illustrate(self, uid: int):
         data = self.get_meta_data(f'https://www.pixiv.net/artworks/{uid}')
+        if data is None:
+            return None
         data = data['illust'][str(uid)]
         title = data['title']
         desc = data['description']
@@ -132,6 +139,11 @@ class PixivAPITest(unittest.TestCase):
     def test_user(self):
         data = self.api.get_user(75913411)
         print(data)
+
+    def test_not_exist(self):
+        res = self.api.get_illustrate(233333)
+        print(res)
+        self.assertIsNone(res)
 
     def test_illustrate(self):
         data = self.api.get_illustrate(87622911)

@@ -35,8 +35,10 @@ class PixivServiceBase:
 
 
 class PixivService(PixivServiceBase, PullService):
-    def pull_item(self, index_item: IndexItem) -> FullItem:
+    def pull_item(self, index_item: IndexItem) -> Optional[FullItem]:
         data = self.api.get_illustrate(int(index_item.item_id))
+        if data is None:
+            return None
         content = f"{' '.join(f'#{t}' for t in data.tags)}\n\n{data.description}"
         self.get_nickname(data.author_id)
         return FullItem(
