@@ -46,8 +46,7 @@ class TweeterServiceBase:
         try:
             status = self.api.get_status(int(sid))
         except TweepError as err:
-            print(err.reason)
-            if err.reason[0]['message'] == 'No status found with that ID.':
+            if err.api_code == 144:  # Not found
                 return None
             raise FetchFailureError(err.reason) from err
         else:
