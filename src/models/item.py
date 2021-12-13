@@ -13,6 +13,7 @@ class ItemInfo(DynamicDocument):
     url = StringField()
     content = StringField()
     image_urls = ListField()
+    tags = ListField(null=True)
 
     meta = {
         'indexes': [
@@ -33,7 +34,8 @@ class ItemInfo(DynamicDocument):
             url=item.url,
             content=item.content,
             image_urls=item.image_urls,
-            upsert=True
+            upsert=True,
+            tags=item.tags
         )
         for ch in channels:
             ItemChannel.objects(service=item.service, item_id=item.item_id, channel=ch).update_one(channel=ch, upsert=True)
@@ -57,7 +59,8 @@ class ItemInfo(DynamicDocument):
             content=self.content,
             source_id=self.source_id,
             url=self.url,
-            image_urls=self.image_urls
+            image_urls=self.image_urls,
+            tags=self.tags
         )
 
     @classmethod

@@ -1,4 +1,5 @@
 import re
+import time
 from dataclasses import dataclass
 from io import BytesIO
 from typing import Optional, IO, Iterable, List
@@ -61,6 +62,7 @@ class FanboxService(FanboxServiceBase, PullService):
         )
 
     def download_item_image(self, item: FullItem, url: str) -> IO:
+        time.sleep(5)
         return BytesIO(self.api.download_image(url))
 
     @classmethod
