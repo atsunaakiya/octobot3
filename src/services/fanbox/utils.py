@@ -1,4 +1,5 @@
 import dataclasses
+import time
 import unittest
 from typing import List, Optional, Tuple
 
@@ -118,6 +119,26 @@ class FanboxApi:
         data = res.json()
         return self._parse_items(data['body']['items'])
 
+    def _iter_pages(self, start_url, pause_time):
+        next_url = start_url
+        while next_url is not None:
+            res = self.get_on_site('www', next_url)
+            data = res.json()['body']
+            yield from self._parse_items(data['items'])
+            next_url = data['nextUrl']
+            time.sleep(pause_time)
+
+    def iter_creator_posts(self, artist, limit=20, pause_time=3):
+        url = f'https://api.fanbox.cc/post.listCreator?creatorId={artist}&limit={limit}'
+        yield from self._iter_pages(url, pause_time)
+
+    def iter_home(self, limit=20, pause_time=3):
+        url = f'https://api.fanbox.cc/post.listHome?limit={limit}'
+        yield from self._iter_pages(url, pause_time)
+
+    def iter_supporting(self, limit=20, pause_time=3):
+        url = f'https://api.fanbox.cc/post.listSupporting?limit={limit}'
+        yield from self._iter_pages(url, pause_time)
 
 
 class FanboxTestCase(unittest.TestCase):
@@ -132,6 +153,10 @@ class FanboxTestCase(unittest.TestCase):
         sess = get_session_from_cookies_file('fanbox-bot')
         self.api = FanboxApi(sess)
         test_dir.mkdir(exist_ok=True)
+
+    def test_iter(self):
+        for artist, post_id in self.api.iter_home():
+            print(artist, post_id)
 
     def test_supporting(self):
         res = self.api.list_supporting(20)
