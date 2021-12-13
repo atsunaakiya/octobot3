@@ -81,3 +81,7 @@ class TelegramService(PushService, TelegramServiceBase):
         for mid in id_list:
             PostRecord.put_record(item.service, item.item_id, ServiceType.Telegram, mid, channel)
         time.sleep(15)
+
+    @staticmethod
+    def push_limit():
+        return 3

@@ -18,22 +18,26 @@ def post_images():
             for pipe in config.pipeline[ch].push:
                 SecondaryTask.add_task(item.service, item.item_id, pipe.service, pipe.config, ch)
         ItemInfo.set_status(item.service, item.item_id, TaskStage.Posting, TaskStatus.Pending)
-    for stype, item_id, ptype, conf, ch in SecondaryTask.poll_tasks():
+    for stype, item_id, ptype, conf, ch, poll_counter in SecondaryTask.poll_tasks(20):
         SecondaryTask.acquire_task(stype, item_id, ptype, conf, ch)
         print((stype.value, item_id), '=>', (ptype.value, conf))
         item = ItemInfo.get_item(stype, item_id)
-        images = [BytesIO(i.read()) for i in ItemInfo.get_images(item)]
         if not service_exists(ptype, conf):
             continue
         client = get_service(ptype, conf)
-        converted_username = pull_services[item.service].convert_username(item.source_id)
-        try:
-            client.push_item(item, images, ch, converted_username)
-        except Exception as err:
-            traceback.print_exc()
-            SecondaryTask.release_task(stype, item_id, ptype, conf, ch)
-        else:
+        if poll_counter >= client.push_limit():
+            print("Failed to push item.")
             SecondaryTask.close_task(stype, item_id, ptype, conf, ch)
+        else:
+            images = [BytesIO(i.read()) for i in ItemInfo.get_images(item)]
+            converted_username = pull_services[item.service].convert_username(item.source_id)
+            try:
+                client.push_item(item, images, ch, converted_username)
+            except Exception as err:
+                traceback.print_exc()
+                SecondaryTask.release_task(stype, item_id, ptype, conf, ch)
+            else:
+                SecondaryTask.close_task(stype, item_id, ptype, conf, ch)
         if SecondaryTask.task_done(stype, item_id):
             print("Post Done", (item.service, item.item_id))
             ItemInfo.set_status(item.service, item.item_id, TaskStage.Cleaning, TaskStatus.Queued)

@@ -245,13 +245,13 @@ class SecondaryTask(DynamicDocument):
         ).update_one(status=SecondaryTaskStatus.Queued)
 
     @classmethod
-    def poll_tasks(cls, limit = 0) -> Iterable[Tuple[ServiceType, str, ServiceType, str, str]]:
+    def poll_tasks(cls, limit=1) -> Iterable[Tuple[ServiceType, str, ServiceType, str, str, int]]:
         for it in cls.objects(status=SecondaryTaskStatus.Queued).order_by('poll_counter'):
             it.poll_counter += 1
             it.save()
-            yield it.pull_service, it.item_id, it.post_service, it.post_conf, it.channel
+            yield it.pull_service, it.item_id, it.post_service, it.post_conf, it.channel, it.poll_counter
             limit -= 1
-            if limit == 0:
+            if limit <= 0:
                 break
 
     @classmethod

@@ -53,5 +53,9 @@ class PushService(ABC):
     def push_item(self, item: FullItem, images: Iterable[IO], channel: str, converted_username: str):
         pass
 
+    @staticmethod
+    def push_limit():
+        return 20
+
 
 BaseService = Union[SubscribeService, PullService, PushService]
