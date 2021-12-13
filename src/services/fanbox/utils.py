@@ -96,12 +96,14 @@ class FanboxApi:
         return [
             int(item['id'])
             for item in data['items']
+            if item['body'] is not None
         ]
 
     def _parse_items(self, items) -> List[Tuple[str, int]]:
         return [
             (item['creatorId'], int(item['id']))
             for item in items
+            if item['body'] is not None
         ]
 
     def list_home(self, limit) -> List[Tuple[str, int]]:
