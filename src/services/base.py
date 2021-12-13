@@ -1,6 +1,6 @@
 import re
 from abc import ABC, abstractmethod
-from typing import Union, Iterable, IO, Optional
+from typing import Union, Iterable, IO, Optional, List
 
 from src.data import IndexItem, FullItem
 
@@ -23,6 +23,10 @@ class SubscribeService(ABC):
     @abstractmethod
     def get_url(cls, name: str) -> Optional[str]:
         pass
+
+    @classmethod
+    def options(cls) -> Optional[List[str]]:
+        return None
 
 
 class PullService(ABC):

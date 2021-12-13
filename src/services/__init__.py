@@ -3,6 +3,7 @@ from typing import Callable, Any, Mapping, Tuple, Type, Dict
 
 from src.enums import ServiceType
 from src.services.base import PullService, PushService, SubscribeService
+from src.services.fanbox import FanboxUsernameSubs, FanboxService, FanboxReflect, FanboxConfig
 from src.services.local import LocalService, LocalConfig
 # from src.services.megasync import MegaService, MegaConfig
 from src.services.pixiv import PixivConfig, PixivService, PixivLikeSubs, PixivSearchSubs, PixivIllustSubs
@@ -16,7 +17,8 @@ config_index: Mapping[ServiceType, Callable[[Dict], Any]] = {
     ServiceType.WebDav: WebDavConfig,
     # ServiceType.Mega: MegaConfig,
     ServiceType.Pixiv: PixivConfig,
-    ServiceType.Local: LocalConfig
+    ServiceType.Local: LocalConfig,
+    ServiceType.Fanbox: FanboxConfig
 }
 
 subscribe_services: Mapping[Tuple[ServiceType, str], Type[SubscribeService]] = {
@@ -24,12 +26,15 @@ subscribe_services: Mapping[Tuple[ServiceType, str], Type[SubscribeService]] = {
     (ServiceType.Twitter, 'likes'): TwitterLikeSubs,
     (ServiceType.Pixiv, 'illust'): PixivIllustSubs,
     (ServiceType.Pixiv, 'likes'): PixivLikeSubs,
-    (ServiceType.Pixiv, 'search'): PixivSearchSubs
+    (ServiceType.Pixiv, 'search'): PixivSearchSubs,
+    (ServiceType.Fanbox, 'username'): FanboxUsernameSubs,
+    (ServiceType.Fanbox, 'reflect'): FanboxReflect
 }
 
 pull_services: Mapping[ServiceType, Type[PullService]] = {
     ServiceType.Twitter: TwitterService,
-    ServiceType.Pixiv: PixivService
+    ServiceType.Pixiv: PixivService,
+    ServiceType.Fanbox: FanboxService
 }
 
 push_services: Mapping[ServiceType, Type[PushService]] = {

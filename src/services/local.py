@@ -19,7 +19,7 @@ class LocalService(PushService):
         self.root = Path(config.root)
 
     def push_item(self, item: FullItem, images: Iterable[IO], channel: str, converted_username: str):
-        parent = self.root / item.service.value / converted_username
+        parent = self.root / item.service.value.replace('/', '_') / converted_username.replace('/', '_')
         parent.mkdir(parents=True, exist_ok=True)
         meta_file = parent / f"{item.item_id}_info.json"
         with meta_file.open('w') as f:

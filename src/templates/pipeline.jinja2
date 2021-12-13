@@ -36,11 +36,19 @@
         </tr>
     </table>
     <h1>Subscriptions</h1>
-    {% for service_type, service_func, source_list, slen in subs %}
+    {% for service_type, service_func, source_list, slen, options in subs %}
         <h2>{{ service_type }}.{{ service_func }} ({{ slen }})</h2>
         <p>
             <form action="/pipeline/{{ pipeline_name }}/subs/add" method="post">
-                <input type="text" name="name">
+                {% if options %}
+                    <select name="name">
+                        {% for op in options %}
+                            <option value="{{ op }}">{{ op }}</option>
+                        {% endfor %}
+                    </select>
+                {% else %}
+                    <input type="text" name="name">
+                {% endif %}
                 <input type="hidden" name="service" value="{{ service_type }}">
                 <input type="hidden" name="func" value="{{ service_func }}">
                 <input type="submit" value="Add">

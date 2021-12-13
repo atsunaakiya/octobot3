@@ -32,7 +32,9 @@ def _pipeline(pipeline_name):
         l = [
             (n, subscribe_services[s.service].get_title(n), subscribe_services[s.service].get_url(n))
             for n, channels in SubscribeSource.get_subs_by_channel(*s.service, pipeline_name)]
-        subs.append((s.service[0].value, s.service[1], l, len(l)))
+        subss = subscribe_services[s.service]
+        options = subss.options()
+        subs.append((s.service[0].value, s.service[1], l, len(l), options))
     status = ItemInfo.count_status()
     return render_template('pipeline.jinja2',
                            pipeline_name=pipeline_name,
