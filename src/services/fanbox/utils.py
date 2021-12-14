@@ -24,6 +24,12 @@ class FanboxPost:
     content: str
     images: List[str]
 
+
+class IterAPIFailure(RuntimeError):
+    def __init__(self, next_url):
+        super(IterAPIFailure, self).__init__(next_url)
+        self.next_url = next_url
+
 class FanboxApi:
     def __init__(self, sess: requests.Session):
         self.sess = sess
@@ -122,7 +128,10 @@ class FanboxApi:
     def _iter_pages(self, start_url, pause_time):
         next_url = start_url
         while next_url is not None:
-            res = self.get_on_site('www', next_url)
+            try:
+                res = self.get_on_site('www', next_url)
+            except requests.exceptions.RequestException as err:
+                raise IterAPIFailure(next_url) from err
             data = res.json()['body']
             yield from self._parse_items(data['items'])
             next_url = data['nextUrl']
