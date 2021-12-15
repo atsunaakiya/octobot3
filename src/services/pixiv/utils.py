@@ -129,12 +129,22 @@ class PixivAPI:
             for w in data['body']['illustManga']['data']
         ]
 
+    def following_illust(self, page):
+        url = f"https://www.pixiv.net/ajax/follow_latest/illust?p={page+1}&mode=all&lang=zh"
+        res = self.sess.get(url)
+        data = res.json()
+        return data['body']['page']['ids']
+
 
 class PixivAPITest(unittest.TestCase):
     def setUp(self) -> None:
         sess = get_session_from_cookies_file('bot')
         self.api = PixivAPI(sess)
         test_dir.mkdir(exist_ok=True)
+
+    def test_following_illust(self):
+        data = self.api.following_illust(0)
+        print(data)
 
     def test_user(self):
         data = self.api.get_user(75913411)

@@ -2,8 +2,7 @@ import re
 import urllib.parse
 
 from dataclasses import dataclass
-from typing import Optional, Iterable, IO
-
+from typing import Optional, Iterable, IO, List
 
 from src.data import FullItem, IndexItem
 from src.enums import ServiceType
@@ -116,3 +115,28 @@ class PixivSearchSubs(PixivServiceBase, SubscribeService):
         name = urllib.parse.quote(name)
         return f'https://www.pixiv.net/tags/{name}/artworks'
 
+
+class PixivReflect(PixivServiceBase, SubscribeService):
+    def subscribe_index(self, name: str) -> Iterable[IndexItem]:
+        if name == 'following':
+            return [
+                IndexItem(service=ServiceType.Pixiv, item_id=str(uid))
+                for uid in self.api.following_illust(0)
+            ]
+        else:
+            raise ValueError(name)
+
+    def subscribe_full(self, name: str) -> Iterable[FullItem]:
+        return []
+
+    @classmethod
+    def get_title(cls, name: str) -> Optional[str]:
+        return name
+
+    @classmethod
+    def get_url(cls, name: str) -> Optional[str]:
+        return f'https://www.pixiv.net/bookmark_new_illust.php'
+
+    @classmethod
+    def options(cls) -> Optional[List[str]]:
+        return ['following']

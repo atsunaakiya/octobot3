@@ -30,6 +30,7 @@ class IterAPIFailure(RuntimeError):
         super(IterAPIFailure, self).__init__(next_url)
         self.next_url = next_url
 
+
 class FanboxApi:
     def __init__(self, sess: requests.Session):
         self.sess = sess
@@ -110,7 +111,7 @@ class FanboxApi:
         return [
             (item['creatorId'], int(item['id']))
             for item in items
-            if item['body'] is not None
+            if item['body'] is not None and item['creatorId'] != 'official'
         ]
 
     def list_home(self, limit) -> List[Tuple[str, int]]:
@@ -129,11 +130,14 @@ class FanboxApi:
         next_url = start_url
         while next_url is not None:
             try:
+                print(next_url)
                 res = self.get_on_site('www', next_url)
             except requests.exceptions.RequestException as err:
                 raise IterAPIFailure(next_url) from err
             data = res.json()['body']
             yield from self._parse_items(data['items'])
+            if next_url == data['nextUrl']:
+                break
             next_url = data['nextUrl']
             time.sleep(pause_time)
 
