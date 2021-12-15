@@ -13,6 +13,7 @@ class FullItem:
     content: str
     image_urls: List[str]
     url: str
+    attachment_urls: Optional[List[str]] = None
     tags: Optional[List[str]] = None
 
     def to_dict(self):
@@ -23,7 +24,8 @@ class FullItem:
             'content': self.content,
             'image_urls': self.image_urls,
             'url': self.url,
-            'tags': self.tags
+            'tags': self.tags,
+            'attachment_urls': self.attachment_urls
         }
 
 

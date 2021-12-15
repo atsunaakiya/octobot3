@@ -1,3 +1,4 @@
+import os.path
 import re
 import time
 from dataclasses import dataclass
@@ -58,7 +59,8 @@ class FanboxService(FanboxServiceBase, PullService):
             content=content,
             image_urls=data.images,
             url=f"https://www.fanbox.cc/@{artist}/posts/{article_id}",
-            tags=data.tags
+            tags=data.tags,
+            attachment_urls=data.files
         )
 
     def download_item_image(self, item: FullItem, url: str) -> IO:
@@ -79,6 +81,18 @@ class FanboxService(FanboxServiceBase, PullService):
     def convert_username(cls, name: str):
         nickname = UserInfo.get_nickname(ServiceType.Fanbox, str(name)) or ''
         return f'{nickname}({name})'
+
+    def extract_attachments(self, item: FullItem, url: str) -> Iterable[IO]:
+        if not url.endswith('.zip'):
+            return
+        print(url)
+        for zf in self.api.download_zip_file(url):
+            fn = zf.name
+            _, ext_fn = os.path.splitext(fn)
+            if ext_fn not in ('.jpg', '.jpeg', '.png'):
+                continue
+            print(fn)
+            yield zf
 
 
 class FanboxUsernameSubs(FanboxServiceBase, SubscribeService):

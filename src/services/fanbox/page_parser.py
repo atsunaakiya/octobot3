@@ -57,3 +57,10 @@ def parse_image_body(body):
         for i in body['images']
     ]
     return text, images
+
+
+def parse_files(body):
+    return [
+        f['url']
+        for f in body['fileMap'].values()
+    ]

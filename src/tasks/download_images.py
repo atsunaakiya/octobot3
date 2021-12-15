@@ -1,3 +1,4 @@
+import itertools
 import time
 import traceback
 from io import BytesIO
@@ -14,6 +15,7 @@ from src.services import pull_services
 
 config = load_config()
 
+
 def download_images():
     for item in ItemInfo.poll_status(TaskStage.Downloading, TaskStatus.Queued, limit=config.limit.download):
         service = get_service(item.service)
@@ -28,6 +30,15 @@ def download_images():
                     buf.seek(0)
                     ItemInfo.save_image(item, url, buf)
                 time.sleep(1)
+            if item.attachment_urls:
+                ctr = itertools.count()
+                for att_url in item.attachment_urls:
+                    for zf in service.extract_attachments(item, att_url):
+                        img = Image.open(zf)
+                        with BytesIO() as buf:
+                            img.save(buf, format="PNG")
+                            buf.seek(0)
+                            ItemInfo.save_attachment_image(item, next(ctr), buf)
         except Exception as err:
             traceback.print_exc()
             ItemInfo.set_status(item.service, item.item_id, TaskStage.Downloading, TaskStatus.Queued)

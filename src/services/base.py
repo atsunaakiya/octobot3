@@ -47,6 +47,9 @@ class PullService(ABC):
     def convert_username(cls, name: str):
         return name
 
+    def extract_attachments(self, item: FullItem, url: str) -> Iterable[IO]:
+        return []
+
 
 class PushService(ABC):
     @abstractmethod

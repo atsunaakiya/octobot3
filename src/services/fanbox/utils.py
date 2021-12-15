@@ -1,11 +1,14 @@
 import dataclasses
+import shutil
+import tempfile
 import time
 import unittest
-from typing import List, Optional, Tuple
+import zipfile
+from typing import List, Optional, Tuple, Iterable
 
 import requests
 
-from src.services.fanbox.page_parser import parse_image_body, parse_article_body
+from src.services.fanbox.page_parser import parse_image_body, parse_article_body, parse_files
 from src.utils.network import get_session_from_cookies_file
 from src.utils.project_path import test_dir
 
@@ -23,6 +26,7 @@ class FanboxPost:
     tags: List[str]
     content: str
     images: List[str]
+    files: List[str]
 
 
 class IterAPIFailure(RuntimeError):
@@ -65,8 +69,17 @@ class FanboxApi:
         title = data['title']
         if page_type == 'article':
             content, images = parse_article_body(body)
+            files = parse_files(body)
         elif page_type == 'image':
             content, images = parse_image_body(body)
+            files = []
+        elif page_type == 'file':
+            content = body['text']
+            images = []
+            files = [
+                f['url']
+                for f in body['files']
+            ]
         else:
             return None
         return FanboxPost(
@@ -75,8 +88,19 @@ class FanboxApi:
             id=uid,
             tags=tags,
             images=images,
-            content=content
+            content=content,
+            files=files
         )
+
+    def download_zip_file(self, url) -> Iterable[zipfile.ZipExtFile]:
+        with tempfile.TemporaryFile() as f:
+            res = self.sess.get(url, stream=True)
+            shutil.copyfileobj(res.raw, f)
+            f.seek(0)
+            with zipfile.ZipFile(f) as zf:
+                for fn in sorted(zf.namelist()):
+                    with zf.open(fn, 'r') as item:
+                        yield item
 
     def download_image(self, url):
         res = self.sess.get(url)
@@ -192,6 +216,15 @@ class FanboxTestCase(unittest.TestCase):
         # print(self.api.get_page('steelwire', 2941820))
         res = self.api.get_page('steelwire', 2393220)
         image = self.api.download_image(res.images[0])
-        print(res)
         with open(test_dir / 'fanbox.png', 'wb') as f:
             f.write(image)
+
+    def test_pure_file(self):
+        res = self.api.get_page('automatakun23bo', 3135332)
+        for fn in self.api.download_zip_file(res.files[0]):
+            print(fn.read)
+
+    def test_file_article(self):
+        res = self.api.get_page('automatakun23bo', 3135336)
+        for fn in self.api.download_zip_file(res.files[0]):
+            print(fn.name)

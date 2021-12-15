@@ -30,6 +30,11 @@ def post_images():
             SecondaryTask.close_task(stype, item_id, ptype, conf, ch)
         else:
             images = [BytesIO(i.read()) for i in ItemInfo.get_images(item)]
+            if item.attachment_urls:
+                attachment_images = [
+                    BytesIO(i.read()) for i in ItemInfo.get_attachment_images(item)
+                ]
+                images.extend(attachment_images)
             converted_username = pull_services[item.service].convert_username(item.source_id)
             try:
                 client.push_item(item, images, ch, converted_username)

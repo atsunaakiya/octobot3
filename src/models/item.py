@@ -14,6 +14,7 @@ class ItemInfo(DynamicDocument):
     content = StringField()
     image_urls = ListField()
     tags = ListField(null=True)
+    attachment_urls = ListField(null=True)
 
     meta = {
         'indexes': [
@@ -35,7 +36,8 @@ class ItemInfo(DynamicDocument):
             content=item.content,
             image_urls=item.image_urls,
             upsert=True,
-            tags=item.tags
+            tags=item.tags,
+            attachment_urls=item.attachment_urls
         )
         for ch in channels:
             ItemChannel.objects(service=item.service, item_id=item.item_id, channel=ch).update_one(channel=ch, upsert=True)
@@ -60,7 +62,8 @@ class ItemInfo(DynamicDocument):
             source_id=self.source_id,
             url=self.url,
             image_urls=self.image_urls,
-            tags=self.tags
+            tags=self.tags,
+            attachment_urls=self.attachment_urls
         )
 
     @classmethod
@@ -104,6 +107,14 @@ class ItemInfo(DynamicDocument):
         cache.save()
 
     @classmethod
+    def save_attachment_image(cls, item: FullItem, index: int, buffer: IO):
+        AttachmentImageCache.objects(service=item.service, item_id=item.item_id, image_index=index).delete()
+        cache = AttachmentImageCache(service=item.service, item_id=item.item_id, image_index=index)
+        cache.file.replace(buffer, content_type="image/png")
+        cache.file.close()
+        cache.save()
+
+    @classmethod
     def count_status(cls):
         fetching = TaskStatusInfo.objects(stage=TaskStage.Fetching, stage_status=TaskStatus.Queued).count()
         downloading = TaskStatusInfo.objects(stage=TaskStage.Downloading, stage_status=TaskStatus.Queued).count()
@@ -142,11 +153,22 @@ class ItemInfo(DynamicDocument):
         ]
 
     @classmethod
+    def get_attachment_images(cls, item: FullItem):
+        return [
+            f.file
+            for f in AttachmentImageCache.objects(service=item.service, item_id=item.item_id).order_by('image_index')
+        ]
+
+    @classmethod
     def clean_cache(cls, item: FullItem):
         for c in ImageCache.objects(service=item.service, item_id=item.item_id):
             c.file.delete()
             c.save()
         ImageCache.objects(service=item.service, item_id=item.item_id).delete()
+        for c in AttachmentImageCache.objects(service=item.service, item_id=item.item_id):
+            c.file.delete()
+            c.save()
+        AttachmentImageCache.objects(service=item.service, item_id=item.item_id).delete()
 
     @classmethod
     def exists(cls, service, item_id):
@@ -195,6 +217,19 @@ class ImageCache(DynamicDocument):
     service = EnumField(ServiceType)
     item_id = StringField()
     url = StringField()
+    file = FileField()
+
+    meta = {
+        'indexes': [
+            {'fields': ['+service', '+item_id', '+url']},
+        ]
+    }
+
+
+class AttachmentImageCache(DynamicDocument):
+    service = EnumField(ServiceType)
+    item_id = StringField()
+    image_index = IntField()
     file = FileField()
 
     meta = {
