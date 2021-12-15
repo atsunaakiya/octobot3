@@ -2,6 +2,7 @@ import sys
 
 from scheduled_tasks import run_schedule
 from src.models.connect import connect_db
+from src.tasks.clean_cache import clean_cache
 from src.tasks.download_images import download_images
 from src.tasks.post_images import post_images
 from src.tasks.server import launch
@@ -28,6 +29,9 @@ def main():
     elif cmd == 'post_images':
         connect_db()
         post_images()
+    elif cmd == 'clean_cache':
+        connect_db()
+        clean_cache()
     else:
         print("WTF??")
 
