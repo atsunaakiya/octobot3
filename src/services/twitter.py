@@ -46,7 +46,7 @@ class TweeterServiceBase:
         try:
             status = self.api.get_status(int(sid))
         except TweepError as err:
-            if err.api_code in (144, 63):  # Not found, user banned
+            if err.api_code in (144, 63, 179):  # Not found, user banned
                 return None
             raise FetchFailureError(err.reason) from err
         else:
