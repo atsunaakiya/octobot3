@@ -67,9 +67,9 @@ class FanboxService(FanboxServiceBase, PullService):
 
     @classmethod
     def parse_item_id(cls, url) -> Optional[str]:
-        res = re.search(r'www\.fanbox\.cc/@(\w+)/posts/(\d+)', url)
+        res = re.search(r'www\.fanbox\.cc/@([\w-]+)/posts/(\d+)', url)
         if res is None:
-            res = re.search(r'(\w+)\.fanbox\.cc/posts/(\d+)', url)
+            res = re.search(r'([\w-]+)\.fanbox\.cc/posts/(\d+)', url)
         if res is None:
             return None
         artist, post_id = res.groups()
