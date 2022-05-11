@@ -29,3 +29,9 @@ class SecondaryTaskStatus(Enum):
     Queued = 'queued'
     Pending = 'pending'
     Finished = 'finished'
+
+
+class SubscribeStatus(Enum):
+    enabled = 'enabled'
+    deleted = 'deleted'
+    missing = 'missing'

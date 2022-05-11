@@ -93,8 +93,17 @@ class PixivAPI:
         url = f'https://www.pixiv.net/ajax/user/{uid}/profile/all?lang=zh'
         data = self.sess.get(url).json()
         data = data['body']
-        id_list = list(data['illusts'].keys()) + list(data['manga'].keys())
+        id_list = self._key_to_list(data['illusts']) + self._key_to_list(data['manga'])
         return id_list
+
+    @staticmethod
+    def _key_to_list(l):
+        if isinstance(l, list):
+            return l
+        elif isinstance(l, dict):
+            return list(l.keys())
+        else:
+            raise TypeError(l)
 
     def download_image(self, url):
         headers = {
