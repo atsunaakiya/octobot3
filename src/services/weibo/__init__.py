@@ -73,6 +73,8 @@ class WeiboReflect(WeiboServiceBase, SubscribeService):
         if name == 'like':
             user_id = self.api.get_user_id()
             results = self.api.get_like_list(user_id, 0)
+            for r in results:
+                UserInfo.set_nickname(ServiceType.Weibo, str(r.user_id), r.user_nickname)
             return [
                 self.weibo_to_full_item(it)
                 for it in results
