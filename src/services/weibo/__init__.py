@@ -59,6 +59,11 @@ class WeiboService(WeiboServiceBase, PullService):
         if res is not None:
             return res.group(1)
 
+    @classmethod
+    def convert_username(cls, name: str):
+        nickname = UserInfo.get_nickname(ServiceType.Weibo, str(name)) or ''
+        return f'{nickname}({name})'
+
 
 class WeiboReflect(WeiboServiceBase, SubscribeService):
     def subscribe_index(self, name: str) -> Iterable[IndexItem]:
