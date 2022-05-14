@@ -53,7 +53,7 @@ class TweeterServiceBase:
             return status2item(status)
 
     def get_user_tweets(self, username) -> Iterable[TwitterItem]:
-        l: Iterable[tweepy.Status] = self.api.user_timeline(username, count=20)
+        l: Iterable[tweepy.Status] = self.api.user_timeline(username, count=40)
         for s in l:
             yield status2item(s)
 
