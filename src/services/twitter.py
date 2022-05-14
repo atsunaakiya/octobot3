@@ -53,12 +53,12 @@ class TweeterServiceBase:
             return status2item(status)
 
     def get_user_tweets(self, username) -> Iterable[TwitterItem]:
-        l: Iterable[tweepy.Status] = self.api.user_timeline(username, count=40)
+        l: Iterable[tweepy.Status] = self.api.user_timeline(username, count=20)
         for s in l:
             yield status2item(s)
 
     def get_user_likes(self, username) -> Iterable[TwitterItem]:
-        l: Iterable[tweepy.Status] = self.api.favorites(username)
+        l: Iterable[tweepy.Status] = self.api.favorites(username, count=40)
         for s in l:
             yield status2item(s)
 
