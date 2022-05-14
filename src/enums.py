@@ -9,6 +9,7 @@ class ServiceType(Enum):
     Pixiv = 'pixiv'
     Fanbox = 'fanbox'
     Local = 'local'
+    Weibo = 'weibo'
 
 
 class TaskStage(Enum):
