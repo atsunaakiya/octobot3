@@ -1,11 +1,13 @@
 import dataclasses
+import json
+import pickle
 import re
 import unittest
 from typing import List, Optional
 
 import requests
 
-from src.utils.network import get_session_from_cookies_file
+from src.utils.network import get_session_from_cookies_file, cookie_jar_root
 from src.utils.project_path import test_dir
 
 
@@ -21,13 +23,28 @@ class WeiboItem:
 class WeiboAPI:
     sess: requests.Session
 
-    def __init__(self, sess: requests.Session):
+    def __init__(self, sess: requests.Session, cookie_jar_name):
         self.sess = sess
         self._user_id = None
+        self._cookie_jar = cookie_jar_root / cookie_jar_name
+        self._load_cookie_jar()
+        cookie_jar_root.mkdir(parents=True, exist_ok=True)
+
+    def _load_cookie_jar(self):
+        if not self._cookie_jar.exists():
+            return
+        with open(self._cookie_jar, 'rb') as f:
+            cookies = pickle.load(f)
+        self.sess.cookies.update(cookies)
+
+    def _save_cookie_jar(self):
+        with open(self._cookie_jar, 'wb') as f:
+            pickle.dump(self.sess.cookies, f)
 
     def get_like_list(self, user_id: int, page: int) -> List[WeiboItem]:
         url = f"https://weibo.com/ajax/statuses/likelist?uid={user_id}&page={page+1}"
         res = self.sess.get(url)
+        self._save_cookie_jar()
         data = res.json()
         items_raw = data['data']['list']
         items = [self._parse_item(it) for it in items_raw if it.get('deleted') != '1']
@@ -36,6 +53,7 @@ class WeiboAPI:
     def get_weibo(self, weibo_id) -> Optional[WeiboItem]:
         url = f'https://weibo.com/ajax/statuses/show?id={weibo_id}'
         res = self.sess.get(url)
+        self._save_cookie_jar()
         if res.status_code == 400:
             return None
         assert res.status_code == 200
@@ -63,9 +81,15 @@ class WeiboAPI:
     def get_user_id(self) -> int:
         if self._user_id is None:
             url = f'https://weibo.com'
-            res = self.sess.get(url)
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36'
+            }
+            res = self.sess.get(url, headers=headers)
+            self._save_cookie_jar()
             body = res.text
-            user_id = re.search(r'"id":(\d+),', body).group(1)
+            config_raw = re.search(r'window\.\$CONFIG\s*=\s*(\{.+?\});', body).group(1)
+            config = json.loads(config_raw)
+            user_id = config['user']['id']
             self._user_id = int(user_id)
         return self._user_id
 
@@ -73,7 +97,7 @@ class WeiboAPI:
 class WeiboCase(unittest.TestCase):
     def setUp(self) -> None:
         sess = get_session_from_cookies_file('weibo')
-        self.api = WeiboAPI(sess)
+        self.api = WeiboAPI(sess, 'weibo-test')
         test_dir.mkdir(exist_ok=True)
 
     def test_get_id(self):

@@ -23,7 +23,7 @@ class WeiboServiceBase:
     def __init__(self, config: WeiboConfig):
         self.config = config
         self.sess = get_session_from_cookies_file(config.cookies)
-        self.api = WeiboAPI(self.sess)
+        self.api = WeiboAPI(self.sess, config.cookies + '.pkl')
 
     @staticmethod
     def weibo_to_full_item(item: WeiboItem):

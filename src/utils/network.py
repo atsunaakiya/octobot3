@@ -7,6 +7,7 @@ import requests
 from src.utils.project_path import project_root
 
 cookies_root = project_root / 'cookies'
+cookie_jar_root = project_root / 'cookie-jar'
 
 
 def get_session_from_cookies(cookies: Dict[str, str]):
@@ -38,3 +39,4 @@ class TestNetworkCases(unittest.TestCase):
         res = sess.get('https://httpbin.org/cookies')
         data = res.json()
         self.assertEqual(cookies, data['cookies'])
+
