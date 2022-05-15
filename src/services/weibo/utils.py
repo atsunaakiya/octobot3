@@ -65,7 +65,7 @@ class WeiboAPI:
             url = f'https://weibo.com'
             res = self.sess.get(url)
             body = res.text
-            user_id = re.search(r'"user":{"id":(\d+),', body).group(1)
+            user_id = re.search(r'"id":(\d+),', body).group(1)
             self._user_id = int(user_id)
         return self._user_id
 
