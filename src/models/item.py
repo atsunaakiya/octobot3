@@ -189,7 +189,7 @@ class ItemInfo(DynamicDocument):
     def get_failures(cls, service: ServiceType, stage: TaskStage):
         return [
             cls.get_item(service=service, item_id=st.item_id)
-            for st in TaskStatusInfo.objects(stage=stage, service=service).order_by('-item_id')
+            for st in TaskStatusInfo.objects(stage=stage, service=service, stage_status=TaskStatus.Failed).order_by('-item_id')
         ]
 
     @classmethod
