@@ -185,6 +185,17 @@ class ItemInfo(DynamicDocument):
                 ItemInfo.set_status(t.service, t.item_id, TaskStage.Cleaning, TaskStatus.Queued)
                 print("Cleaning finished task:", t.service, t.item_id)
 
+    @classmethod
+    def get_failures(cls, service: ServiceType, stage: TaskStage):
+        return [
+            cls.get_item(service=service, item_id=st.item_id)
+            for st in TaskStatusInfo.objects(stage=stage, service=service).order_by('-item_id')
+        ]
+
+    @classmethod
+    def retry_failure(cls, service: ServiceType, item_id: str):
+        TaskStatusInfo.objects(service=service, item_id=item_id).update(stage_status=TaskStatus.Queued, poll_counter=0)
+
 class ItemChannel(DynamicDocument):
     service = EnumField(ServiceType)
     item_id = StringField()

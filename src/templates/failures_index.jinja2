@@ -1,0 +1,26 @@
+<html>
+    <head>
+        <title>Failures</title>
+    </head>
+    <body>
+        <h1>Failures</h1>
+        <table>
+            <th>
+                <td></td>
+                {% for t in stage_list %}
+                    <td>{{t.name}}</td>
+                {% end %}
+            </th>
+            {% for s in service_types %}
+            <tr>
+                <td>{{s.name}}</td>
+                {% for t in stage_list %}
+                    <td>
+                        <a href="/failures/{{s.value}}/{{t.value}}">View</a>
+                    </td>
+                {% end %}
+            </tr>
+            {% end %}
+        </table>
+    </body>
+</html>

@@ -1,0 +1,31 @@
+<html>
+    <head>
+        <title>Failures</title>
+    </head>
+    <body>
+        <h1>Failures [{{item_type.name}}] @ [{{item_stage.name}}]</h1>
+        <table>
+            <th>
+                <td>Item ID</td>
+                <td>Author</td>
+                <td>URL</td>
+                <td>Action</td>
+            </th>
+            {% for it in items %}
+            <tr>
+                <td>{{it.item_id}}</td>
+                <td>{{it.source_id}}</td>
+                <td>{{it.url}}</td>
+                <td>
+                    <form action="/failures/reset" method="post">
+                        <input type="hidden" name="service" value="{{it.service.value}}">
+                        <input type="hidden" name="item_id" value="{{it.item_id}}">
+                        <input type="hidden" name="stage" value="{{stage.value}}">
+                        <input type="submit" value="Reset">
+                    </form>
+                </td>
+            </tr>
+            {% end %}
+        </table>
+    </body>
+</html>

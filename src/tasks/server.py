@@ -77,6 +77,35 @@ def _add_item(pipeline_name):
         return redirect(f"/pipeline/{pipeline_name}")
     return "Unknown URL"
 
+@app.route("/failures", methods=["GET"])
+def _failure_browser_root():
+    config = load_config()
+    service_types = [
+        t
+        for t in [ServiceType.Twitter, ServiceType.Pixiv, ServiceType.Fanbox,
+                                              ServiceType.Weibo]
+        if t in config.api
+    ]
+    stage_list = [TaskStage.Fetching, TaskStage.Downloading, TaskStage.Posting, TaskStage.Cleaning]
+    return render_template('failures_index.jinja2', stage_list=stage_list, service_types=service_types)
+
+
+@app.route("/failures/reset", methods=["POST"])
+def _reset_failure():
+    service = ServiceType(request.form.get("service"))
+    stage = TaskStage(request.form.get("stage"))
+    item_id = request.form.get("item_id")
+    ItemInfo.retry_failure(service, item_id)
+    return redirect(f'/failures/{service.value}/{stage.value}')
+
+
+@app.route("/failures/<item_type>/<item_stage>", methods=["GET"])
+def _failure_browser(item_type, item_stage):
+    item_type = ServiceType(item_type)
+    item_stage = TaskStage(item_stage)
+    items = ItemInfo.get_failures(service=item_type, stage=item_stage)
+    return render_template('failures.jinja2', items=items, stage=item_stage)
+
 
 def launch():
     conf = load_config().server
