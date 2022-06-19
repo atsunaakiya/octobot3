@@ -9,7 +9,7 @@
                 <td></td>
                 {% for t in stage_list %}
                     <td>{{t.name}}</td>
-                {% end %}
+                {% endfor %}
             </th>
             {% for s in service_types %}
             <tr>
@@ -18,9 +18,9 @@
                     <td>
                         <a href="/failures/{{s.value}}/{{t.value}}">View</a>
                     </td>
-                {% end %}
+                {% endfor %}
             </tr>
-            {% end %}
+            {% endfor %}
         </table>
     </body>
 </html>
