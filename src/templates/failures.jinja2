@@ -8,14 +8,14 @@
             <th>
                 <td>Item ID</td>
                 <td>Author</td>
-                <td>URL</td>
+                <td>Link</td>
                 <td>Action</td>
             </th>
             {% for it in items %}
             <tr>
                 <td>{{it.item_id}}</td>
                 <td>{{it.source_id}}</td>
-                <td>{{it.url}}</td>
+                <td><a href="{{it.url}}" target="_blank">Link</a></td>
                 <td>
                     <form action="/failures/reset" method="post">
                         <input type="hidden" name="service" value="{{it.service.value}}">
