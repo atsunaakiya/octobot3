@@ -5,12 +5,12 @@
     <body>
         <h1>Failures</h1>
         <table>
-            <th>
-                <td></td>
+            <tr>
+                <th></th>
                 {% for t in stage_list %}
-                    <td>{{t.name}}</td>
+                    <th>{{t.name}}</th>
                 {% endfor %}
-            </th>
+            </tr>
             {% for s in service_types %}
             <tr>
                 <td>{{s.name}}</td>

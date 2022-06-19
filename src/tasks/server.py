@@ -104,7 +104,7 @@ def _failure_browser(item_type, item_stage):
     item_type = ServiceType(item_type)
     item_stage = TaskStage(item_stage)
     items = ItemInfo.get_failures(service=item_type, stage=item_stage)
-    return render_template('failures.jinja2', items=items, stage=item_stage)
+    return render_template('failures.jinja2', items=items, stage=item_stage, item_type=item_type)
 
 
 def launch():
