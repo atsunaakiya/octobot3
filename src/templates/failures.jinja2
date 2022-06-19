@@ -5,12 +5,12 @@
     <body>
         <h1>Failures [{{item_type.name}}] @ [{{stage.name}}]</h1>
         <table>
-            <th>
-                <td>Item ID</td>
-                <td>Author</td>
-                <td>Link</td>
-                <td>Action</td>
-            </th>
+            <tr>
+                <th>Item ID</th>
+                <th>Author</th>
+                <th>Link</th>
+                <th>Action</th>
+            </tr>
             {% for it in items %}
             <tr>
                 <td>{{it.item_id}}</td>
