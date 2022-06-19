@@ -15,7 +15,13 @@
             <tr>
                 <td>{{it.item_id}}</td>
                 <td>{{it.source_id}}</td>
-                <td><a href="{{it.url}}" target="_blank">Link</a></td>
+                <td>
+                    {% if it.url %}
+                    <a href="{{it.url}}" target="_blank">Link</a>
+                    {% else %}
+                    None
+                    {% endif %}
+                </td>
                 <td>
                     <form action="/failures/reset" method="post">
                         <input type="hidden" name="service" value="{{it.service.value}}">
